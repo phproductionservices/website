@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CalendarDays, Clock, MapPin } from "lucide-react";
+import Image from "next/image";
+import logo from "@/public/images/ph.jpg";
 
 const speakers = [
   {
@@ -47,8 +49,14 @@ export default function Home() {
       <nav className="border-b">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-blue-600 rounded-full"></div>
-            <span className="font-bold text-xl">Actos</span>
+
+            <Image
+              src={logo}
+              alt="logo"
+              width={100}
+              height={40}
+            />
+
           </div>
           <div className="hidden md:flex space-x-6">
             <a href="#" className="text-sm font-medium">About us</a>
@@ -57,20 +65,20 @@ export default function Home() {
             <a href="#" className="text-sm font-medium">Blog</a>
             <a href="#" className="text-sm font-medium">Tickets</a>
           </div>
-          <Button>Register now</Button>
+          <Button className="bg-[#2562FF]">Contact Us</Button>
         </div>
       </nav>
 
       {/* Hero Section */}
-      <section className="relative">
-        <div className="container mx-auto px-4 py-24 grid md:grid-cols-2 gap-12 items-center">
-          <div>
-            <h1 className="text-5xl font-bold leading-tight mb-6">
+      <section className="relative bg-[#1e1e1e]">
+        <div className="container mx-auto px-4 py-24 grid md:grid-cols-2 gap-12 items-center relative">
+          <div className="z-10">
+            <h1 className="text-5xl font-bold leading-tight mb-6 text-white">
               The Premier Professional Conference of the Year
             </h1>
-            <p className="text-lg text-gray-600 mb-8">
-              This is a gathering for thought leaders, inventors and tech 
-              entrepreneurs in the heart of NYC. Join year running, this 
+            <p className="text-lg text-gray-300 mb-8">
+              This is a gathering for thought leaders, inventors, and tech
+              entrepreneurs in the heart of NYC. Join us for a year running, this
               conference covers all things digital and innovation.
             </p>
             <div className="flex space-x-4">
@@ -78,15 +86,17 @@ export default function Home() {
               <Button size="lg" variant="outline">Book a stand</Button>
             </div>
           </div>
-          <div className="relative">
+          <div className="relative w-full h-[500px] md:h-full">
             <img
               src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=2070&auto=format&fit=crop"
               alt="Conference meeting"
-              className="rounded-lg shadow-xl"
+              className="absolute top-0 left-0 w-full h-full object-cover"
             />
           </div>
         </div>
       </section>
+
+
 
       {/* About Section */}
       <section className="bg-gray-50 py-24">
@@ -104,15 +114,15 @@ export default function Home() {
                 About the Premier Conference 2023
               </h2>
               <p className="text-gray-600 mb-6">
-                The Annual Professional Conference is an exciting gathering of industry 
-                leaders, tech innovators, and professionals from across the country. This 
-                year's event will feature a wide range of sessions and workshops designed to 
+                The Annual Professional Conference is an exciting gathering of industry
+                leaders, tech innovators, and professionals from across the country. This
+                year's event will feature a wide range of sessions and workshops designed to
                 help attendees stay ahead of the curve and achieve their professional goals.
               </p>
               <p className="text-gray-600">
-                This year's conference will be held at the San Diego Convention Center in 
-                San Diego, California. With easy access to transportation, nearby hotels, and 
-                a wide range of dining and entertainment options, SDCC is the perfect 
+                This year's conference will be held at the San Diego Convention Center in
+                San Diego, California. With easy access to transportation, nearby hotels, and
+                a wide range of dining and entertainment options, SDCC is the perfect
                 place to host our premier conference.
               </p>
             </div>
@@ -151,8 +161,8 @@ export default function Home() {
                     <div>
                       <h3 className="text-2xl font-bold mb-4">Marketing Mastery Workshop</h3>
                       <p className="text-gray-400 mb-6">
-                        A practical workshop focusing on the success on the Newcastle Markets 
-                        system. Join our workshop, where we dive deep around the focus in selected services 
+                        A practical workshop focusing on the success on the Newcastle Markets
+                        system. Join our workshop, where we dive deep around the focus in selected services
                         and products for the coming generations.
                       </p>
                       <div className="flex flex-col space-y-4 mb-6">
@@ -234,7 +244,7 @@ export default function Home() {
             <div>
               <h4 className="font-semibold mb-4">Subscribe Now</h4>
               <p className="text-gray-400 mb-4">
-                Express to join our community! Stay informed & inspired. Enter 
+                Express to join our community! Stay informed & inspired. Enter
                 your email below to join our community.
               </p>
               <div className="flex space-x-2">
