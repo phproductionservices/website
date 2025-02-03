@@ -3,39 +3,36 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { CalendarDays, Clock, MapPin } from "lucide-react";
-import Image from "next/image";
-import logo from "@/public/images/ph.jpg";
+import { CalendarDays, Clock, MapPin, ArrowRight, Zap, Menu } from "lucide-react";
+import { motion } from "framer-motion";
+import { useInView } from "react-intersection-observer";
+import Link from "next/link";
+import { useState } from "react";
 
 const speakers = [
   {
     name: "Amelia Laurent",
     role: "Founder & CEO",
-    company:
-      "Former co-founder of Chainstack. Early start at Spotify and Clearbit",
-    image:
-      "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=400&h=400&auto=format&fit=crop",
+    company: "Former co-founder of Chainstack. Early start at Spotify and Clearbit",
+    image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=400&h=400&auto=format&fit=crop",
   },
   {
     name: "Nicolas Ochieng",
     role: "Engineering Manager",
     company: "Lead engineering team at Figma, Proto and Product Labs",
-    image:
-      "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?q=80&w=400&h=400&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?q=80&w=400&h=400&auto=format&fit=crop",
   },
   {
     name: "Sienna Hewitt",
     role: "Product Manager",
     company: "Former PM for Linear. Previously Stripe and DrChrono",
-    image:
-      "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=400&h=400&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=400&h=400&auto=format&fit=crop",
   },
   {
     name: "Lily-Rose Charley",
     role: "Frontend Developer",
     company: "Senior Developer for Linear, Coinbase, and Postscript",
-    image:
-      "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?q=80&w=400&h=400&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?q=80&w=400&h=400&auto=format&fit=crop",
   },
 ];
 
@@ -47,220 +44,363 @@ const days = [
   { number: "5", date: "Fri, Sept 28" },
 ];
 
+const fadeInUp = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0 },
+};
+
+const staggerChildren = {
+  visible: {
+    transition: {
+      staggerChildren: 0.1,
+    },
+  },
+};
+
 export default function Home() {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [aboutRef, aboutInView] = useInView({
+    triggerOnce: true,
+    threshold: 0.2,
+  });
+
+  const [speakersRef, speakersInView] = useInView({
+    triggerOnce: true,
+    threshold: 0.2,
+  });
+
+  const scrollToSection = (id: string) => {
+    const element = document.getElementById(id);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+    setIsMenuOpen(false);
+  };
+
   return (
     <div className="flex flex-col min-h-screen">
-      {/* Navigation */}
-      <nav className="border-b">
+      {/* Navigation with glass effect */}
+      <nav className="fixed w-full z-50 bg-white/80 backdrop-blur-md border-b">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <div className="flex items-center space-x-2">
-            <Image src={logo} alt="logo" width={100} height={40} />
+            <div className="flex items-center gap-2">
+              <img
+              src="/images/PH.png" // Replace with your image path
+              alt="Actos Logo"
+              className="h-12 w-auto"
+            />
+            </div>
           </div>
-          <div className="hidden md:flex space-x-6">
-            <a href="#" className="text-sm font-medium">
+          
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex space-x-8">
+            <button 
+              onClick={() => scrollToSection('about')}
+              className="text-sm font-medium hover:text-blue-600 transition-colors"
+            >
               About us
-            </a>
-            <a href="#" className="text-sm font-medium">
+            </button>
+            <Link href="/admin/events" className="text-sm font-medium hover:text-blue-600 transition-colors">
               Events
-            </a>
-            <a href="#" className="text-sm font-medium">
+            </Link>
+            <button 
+              onClick={() => scrollToSection('speakers')}
+              className="text-sm font-medium hover:text-blue-600 transition-colors"
+            >
               Speakers
-            </a>
-            <a href="#" className="text-sm font-medium">
-              Blog
-            </a>
-            <a href="#" className="text-sm font-medium">
+            </button>
+            <Link href="/ticket" className="text-sm font-medium hover:text-blue-600 transition-colors">
               Tickets
-            </a>
+            </Link>
           </div>
-          <Button className="bg-[#2562FF]">Contact Us</Button>
+
+          {/* Mobile Menu Button */}
+          <div className="md:hidden flex items-center gap-4">
+            <Button 
+              variant="ghost" 
+              size="icon"
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="text-gray-600"
+            >
+              <Menu className="h-6 w-6" />
+            </Button>
+          </div>
+
+          <Button className="hidden md:flex bg-[#2562FF] hover:bg-blue-700 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-blue-500/25">
+            Contact Us
+          </Button>
         </div>
+
+        {/* Mobile Navigation */}
+        {isMenuOpen && (
+          <motion.div 
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="md:hidden bg-white border-t"
+          >
+            <div className="flex flex-col p-4 space-y-4">
+              <button 
+                onClick={() => scrollToSection('about')}
+                className="text-sm font-medium hover:text-blue-600 transition-colors py-2"
+              >
+                About us
+              </button>
+              <Link href="/admin/events" className="text-sm font-medium hover:text-blue-600 transition-colors py-2">
+                Events
+              </Link>
+              <button 
+                onClick={() => scrollToSection('speakers')}
+                className="text-sm font-medium hover:text-blue-600 transition-colors py-2"
+              >
+                Speakers
+              </button>
+              <Link href="/ticket" className="text-sm font-medium hover:text-blue-600 transition-colors py-2">
+                Tickets
+              </Link>
+              <Button className="w-full bg-[#2562FF] hover:bg-blue-700">
+                Contact Us
+              </Button>
+            </div>
+          </motion.div>
+        )}
       </nav>
 
       {/* Hero Section */}
-      <section className="relative bg-[#1e1e1e] h-[700px]">
-        <div className="grid grid-cols-2 h-full">
-          {/* Left Content Section */}
-          <div className="flex flex-col justify-center px-8 text-white">
-            <h1 className="text-5xl font-bold leading-tight mb-6">
-              The Premier Professional Conference of the Year
-            </h1>
-            <p className="text-lg text-gray-300 mb-8">
-              Delux is a gathering for thought leaders, inventors, and tech
-              entrepreneurs in the heart of NYC. 12th year running, this
-              conference covers all things digital and innovation.
-            </p>
-            <div className="flex space-x-4">
-              <Button className="bg-[#2562FF]" size="lg">Get Tickets</Button>
-              <Button className="text-black" size="lg" variant="outline">
-                Book a stand
-              </Button>
-            </div>
-          </div>
+      <section className="relative bg-[#1e1e1e] min-h-screen flex items-center pt-16 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-900/20 via-[#1e1e1e] to-[#1e1e1e]"></div>
+        
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <motion.div 
+              initial="hidden"
+              animate="visible"
+              variants={staggerChildren}
+              className="flex flex-col justify-center text-white"
+            >
+              <motion.div
+                variants={fadeInUp}
+                className="inline-block mb-4 px-4 py-1 rounded-full bg-blue-600/10 border border-blue-500/20"
+              >
+                <span className="text-blue-400">2024 Premier Tech Conference</span>
+              </motion.div>
+              <motion.h1 
+                variants={fadeInUp}
+                className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6 bg-clip-text text-transparent bg-gradient-to-r from-white via-gray-100 to-gray-300"
+              >
+                The Premier Professional Conference of the Year
+              </motion.h1>
+              <motion.p 
+                variants={fadeInUp}
+                className="text-lg md:text-xl text-gray-300 mb-8"
+              >
+                Delux is a gathering for thought leaders, inventors, and tech
+                entrepreneurs in the heart of NYC. 12th year running, this
+                conference covers all things digital and innovation.
+              </motion.p>
+              <motion.div 
+                variants={fadeInUp}
+                className="flex flex-col sm:flex-row gap-4"
+              >
+                <Button 
+                  className="bg-[#2562FF] hover:bg-blue-700 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-blue-500/25 w-full sm:w-auto" 
+                  size="lg"
+                >
+                  Get Tickets <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+                <Button 
+                  className="text-white border-white hover:bg-white text-black hover:text-gray-400 transition-all duration-300 transform hover:scale-105 shadow-lg w-full sm:w-auto" 
+                  size="lg" 
+                  variant="outline"
+                >
+                  Book a stand
+                </Button>
+              </motion.div>
+            </motion.div>
 
-          {/* Right Image Section */}
-          <div className="relative w-full h-[700px]">
-            <img
-              src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=2070&auto=format&fit=crop"
-              alt="Conference meeting"
-              className="absolute inset-0 w-full h-full object-cover"
-            />
+            <motion.div 
+              initial={{ opacity: 0, x: 100 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8 }}
+              className="relative w-full min-h-[400px] lg:min-h-[700px] mt-8 lg:mt-0"
+            >
+              <div className="absolute inset-0 bg-gradient-to-r from-[#1e1e1e] via-transparent to-transparent w-[20%] z-20"></div>
+              <div className="absolute inset-0 bg-gradient-to-t from-[#1e1e1e] via-transparent to-transparent h-[20%] bottom-0 z-20"></div>
+              
+              <div className="absolute inset-0 overflow-hidden rounded-2xl lg:rounded-l-[3rem]">
+                <img
+                  src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=2070&auto=format&fit=crop"
+                  alt="Conference meeting"
+                  className="absolute inset-0 w-full h-full object-cover transform hover:scale-105 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-900/30 to-transparent"></div>
+              </div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5 }}
+                className="absolute bottom-8 left-8 right-8 bg-white/10 backdrop-blur-lg rounded-xl p-4 md:p-6 z-30"
+              >
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between text-white gap-4">
+                  <div className="flex items-center gap-4">
+                    <div className="p-3 bg-blue-600/20 rounded-lg">
+                      <CalendarDays className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <p className="font-medium">Next Event</p>
+                      <p className="text-sm text-gray-300">March 15-18, 2024</p>
+                    </div>
+                  </div>
+                  <Button 
+                    variant="outline" 
+                    className="border-white/20 text-white hover:bg-white/10 text-black w-full sm:w-auto"
+                  >
+                    Register Now
+                  </Button>
+                </div>
+              </motion.div>
+            </motion.div>
           </div>
         </div>
       </section>
 
-      {/* About Section */}
-      <section className="bg-gray-50 py-24">
+      {/* About Section with Reveal on Scroll */}
+      <section id="about" ref={aboutRef} className="bg-gray-50 py-32 scroll-mt-16">
         <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-            <div>
+          <motion.div 
+            initial="hidden"
+            animate={aboutInView ? "visible" : "hidden"}
+            variants={staggerChildren}
+            className="grid md:grid-cols-2 gap-16 items-center"
+          >
+            <motion.div variants={fadeInUp}>
               <img
                 src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=2070&auto=format&fit=crop"
                 alt="Conference space"
-                className="rounded-lg shadow-xl"
+                className="rounded-2xl shadow-2xl hover:shadow-3xl transition-shadow duration-300"
               />
-            </div>
-            <div>
-              <h2 className="text-3xl font-bold mb-6">
+            </motion.div>
+            <motion.div variants={fadeInUp} className="space-y-6">
+              <h2 className="text-4xl font-bold mb-6">
                 About the Premier Conference 2023
               </h2>
-              <p className="text-gray-600 mb-6">
+              <p className="text-gray-600 text-lg leading-relaxed">
                 The Annual Professional Conference is an exciting gathering of
                 industry leaders, tech innovators, and professionals from across
                 the country. This year's event will feature a wide range of
                 sessions and workshops designed to help attendees stay ahead of
                 the curve and achieve their professional goals.
               </p>
-              <p className="text-gray-600">
+              <p className="text-gray-600 text-lg leading-relaxed">
                 This year's conference will be held at the San Diego Convention
                 Center in San Diego, California. With easy access to
                 transportation, nearby hotels, and a wide range of dining and
                 entertainment options, SDCC is the perfect place to host our
                 premier conference.
               </p>
-            </div>
-          </div>
+              <Button className="mt-6" variant="outline">
+                Learn More <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </motion.div>
+          </motion.div>
         </div>
       </section>
 
-      {/* Schedule Section */}
-      <section className="py-24 bg-gray-900 text-white">
+      {/* Speakers Section with Card Animations */}
+      <section id="speakers" ref={speakersRef} className="py-32 scroll-mt-16">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold mb-12">
-            Explore our events & workshops
-          </h2>
-          <Tabs defaultValue="1" className="w-full">
-            <TabsList className="mb-8">
-              {days.map((day) => (
-                <TabsTrigger
-                  key={day.number}
-                  value={day.number}
-                  className="flex-1"
-                >
-                  <div className="text-left">
-                    <div className="font-semibold">Day {day.number}</div>
-                    <div className="text-sm opacity-80">{day.date}</div>
+          <motion.h2 
+            initial={{ opacity: 0, y: 20 }}
+            animate={speakersInView ? { opacity: 1, y: 0 } : {}}
+            className="text-4xl font-bold mb-16 text-center"
+          >
+            Meet Our Speakers
+          </motion.h2>
+          <motion.div 
+            initial="hidden"
+            animate={speakersInView ? "visible" : "hidden"}
+            variants={staggerChildren}
+            className="grid md:grid-cols-2 lg:grid-cols-4 gap-8"
+          >
+            {speakers.map((speaker, index) => (
+              <motion.div
+                key={speaker.name}
+                variants={fadeInUp}
+                whileHover={{ y: -10 }}
+                transition={{ duration: 0.3 }}
+              >
+                <Card className="overflow-hidden group">
+                  <div className="relative overflow-hidden">
+                    <img
+                      src={speaker.image}
+                      alt={speaker.name}
+                      className="w-full h-64 object-cover transform group-hover:scale-110 transition-transform duration-500"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   </div>
-                </TabsTrigger>
-              ))}
-            </TabsList>
-            <TabsContent value="1">
-              <Card className="bg-gray-800 border-gray-700">
-                <div className="p-6">
-                  <div className="grid md:grid-cols-2 gap-8">
-                    <div>
-                      <img
-                        src="https://images.unsplash.com/photo-1552664730-d307ca884978?q=80&w=2070&auto=format&fit=crop"
-                        alt="Marketing workshop"
-                        className="rounded-lg mb-6"
-                      />
-                    </div>
-                    <div>
-                      <h3 className="text-2xl font-bold mb-4">
-                        Marketing Mastery Workshop
-                      </h3>
-                      <p className="text-gray-400 mb-6">
-                        A practical workshop focusing on the success on the
-                        Newcastle Markets system. Join our workshop, where we
-                        dive deep around the focus in selected services and
-                        products for the coming generations.
-                      </p>
-                      <div className="flex flex-col space-y-4 mb-6">
-                        <div className="flex items-center space-x-2">
-                          <Clock className="w-5 h-5" />
-                          <span>10am - 1pm</span>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <MapPin className="w-5 h-5" />
-                          <span>New York, USA</span>
-                        </div>
-                      </div>
-                      <div className="flex space-x-4">
-                        <Button>Get Tickets</Button>
-                        <Button variant="outline">Book a stand</Button>
-                      </div>
-                    </div>
+                  <div className="p-6">
+                    <h3 className="font-bold text-lg mb-1">{speaker.name}</h3>
+                    <p className="text-blue-600 text-sm mb-2">{speaker.role}</p>
+                    <p className="text-gray-600 text-sm">{speaker.company}</p>
                   </div>
-                </div>
-              </Card>
-            </TabsContent>
-          </Tabs>
-        </div>
-      </section>
-
-      {/* Speakers Section */}
-      <section className="py-24">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold mb-12 text-center">
-            Highlight Speakers
-          </h2>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {speakers.map((speaker) => (
-              <Card key={speaker.name} className="overflow-hidden">
-                <img
-                  src={speaker.image}
-                  alt={speaker.name}
-                  className="w-full h-64 object-cover"
-                />
-                <div className="p-6">
-                  <h3 className="font-bold text-lg mb-1">{speaker.name}</h3>
-                  <p className="text-blue-600 text-sm mb-2">{speaker.role}</p>
-                  <p className="text-gray-600 text-sm">{speaker.company}</p>
-                </div>
-              </Card>
+                </Card>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12">
+      {/* Footer with Gradient */}
+      <footer className="bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 text-white py-20">
         <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-4 gap-8">
+          <div className="grid md:grid-cols-4 gap-12">
             <div>
               <div className="flex items-center space-x-2 mb-6">
-                <div className="w-8 h-8 bg-blue-600 rounded-full"></div>
+                <Zap className="w-8 h-8 text-blue-600" />
                 <span className="font-bold text-xl">Actos</span>
               </div>
               <p className="text-gray-400">info@example.com</p>
               <p className="text-gray-400">+1(555) 000-0000</p>
             </div>
             <div>
-              <h4 className="font-semibold mb-4">About us</h4>
+              <h4 className="font-semibold mb-4">Quick Links</h4>
               <ul className="space-y-2 text-gray-400">
-                <li>Events</li>
-                <li>Team</li>
-                <li>Blog</li>
-                <li>Careers</li>
+                <li>
+                  <button 
+                    onClick={() => scrollToSection('about')}
+                    className="hover:text-white transition-colors cursor-pointer"
+                  >
+                    About us
+                  </button>
+                </li>
+                <li>
+                  <Link href="/admin/events" className="hover:text-white transition-colors cursor-pointer">
+                    Events
+                  </Link>
+                </li>
+                <li>
+                  <button 
+                    onClick={() => scrollToSection('speakers')}
+                    className="hover:text-white transition-colors cursor-pointer"
+                  >
+                    Speakers
+                  </button>
+                </li>
+                <li>
+                  <Link href="/ticket" className="hover:text-white transition-colors cursor-pointer">
+                    Tickets
+                  </Link>
+                </li>
               </ul>
             </div>
             <div>
               <h4 className="font-semibold mb-4">Resources</h4>
               <ul className="space-y-2 text-gray-400">
-                <li>Terms</li>
-                <li>Privacy</li>
-                <li>Help Center</li>
-                <li>Contact us</li>
+                <li className="hover:text-white transition-colors cursor-pointer">Terms</li>
+                <li className="hover:text-white transition-colors cursor-pointer">Privacy</li>
+                <li className="hover:text-white transition-colors cursor-pointer">Help Center</li>
+                <li className="hover:text-white transition-colors cursor-pointer">Contact us</li>
               </ul>
             </div>
             <div>
@@ -273,13 +413,15 @@ export default function Home() {
                 <input
                   type="email"
                   placeholder="Enter your email"
-                  className="flex-1 px-4 py-2 rounded-lg bg-gray-800 border border-gray-700"
+                  className="flex-1 px-4 py-2 rounded-lg bg-gray-800 border border-gray-700 focus:outline-none focus:border-blue-500 transition-colors"
                 />
-                <Button>Subscribe</Button>
+                <Button className="bg-blue-600 hover:bg-blue-700 transition-colors">
+                  Subscribe
+                </Button>
               </div>
             </div>
           </div>
-          <div className="border-t border-gray-800 mt-12 pt-8 text-center text-gray-400">
+          <div className="border-t border-gray-800 mt-16 pt-8 text-center text-gray-400">
             <p>© 2024 Actos. All rights reserved.</p>
           </div>
         </div>
