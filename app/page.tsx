@@ -8,6 +8,7 @@ import { motion } from "framer-motion";
 import { useInView } from "react-intersection-observer";
 import Link from "next/link";
 import { useState } from "react";
+import Image from "next/image";
 
 const speakers = [
   {
@@ -84,11 +85,13 @@ export default function Home() {
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <div className="flex items-center space-x-2">
             <div className="flex items-center gap-2">
-              <img
-              src="/images/PH.png" // Replace with your image path
-              alt="Actos Logo"
-              className="h-12 w-auto"
-            />
+              <Image
+                src="/images/PH.png"
+                alt="Actos Logo"
+                width={48}
+                height={48}
+                className="h-12 w-auto"
+              />
             </div>
           </div>
           
