@@ -1,5 +1,13 @@
 import { DataSource } from "typeorm";
 import "reflect-metadata";
+import { User } from "./entities/user.entity";
+import { City } from "./entities/city.entity";
+import { Country } from "./entities/country.entity";
+import { Registration } from "./entities/registration.entity";
+import { Speaker } from "./entities/speaker.entity";
+import { State } from "./entities/state.entity";
+import { Ticket } from "./entities/ticket.entity";
+import { Workshop } from "./entities/workshop.entity";
 
 console.log("📂 Loading entities from:", __dirname + "/entities/*.ts");
 console.log("📂 Loading migrations from:", __dirname + "/migrations/*.ts");
@@ -13,7 +21,9 @@ export const AppDataSource = new DataSource({
   database: process.env.DATABASE_NAME || "public",
   synchronize: false,
   logging: true,
-  entities: [__dirname + "/entities/*.ts"],
+  entities: [
+    User, Ticket, Registration, Workshop, Speaker, State, City, Country, Event
+  ],
   migrations: [__dirname + "/migrations/*.ts"],
   subscribers: [],
 });
