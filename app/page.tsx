@@ -3,8 +3,8 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { CalendarDays, Clock, MapPin, ArrowRight, Zap, Menu } from "lucide-react";
-import { motion } from "framer-motion";
+import { CalendarDays, Clock, MapPin, ArrowRight, Zap, Menu, X } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { useInView } from "react-intersection-observer";
 import Link from "next/link";
 import { useState } from "react";
@@ -78,13 +78,51 @@ export default function Home() {
     setIsMenuOpen(false);
   };
 
+  const menuVariants = {
+    closed: {
+      opacity: 0,
+      height: 0,
+      transition: {
+        duration: 0.3,
+        ease: "easeInOut"
+      }
+    },
+    open: {
+      opacity: 1,
+      height: "auto",
+      transition: {
+        duration: 0.3,
+        ease: "easeInOut"
+      }
+    }
+  };
+
+  const menuItemVariants = {
+    closed: { x: -20, opacity: 0 },
+    open: (i: number) => ({
+      x: 0,
+      opacity: 1,
+      transition: {
+        delay: i * 0.1,
+        duration: 0.3,
+        ease: "easeOut"
+      }
+    })
+  };
+
+  const navItems = [
+    { label: "About us", action: () => scrollToSection('about') },
+    { label: "Events", href: "/admin/events" },
+    { label: "Speakers", action: () => scrollToSection('speakers') },
+    { label: "Tickets", href: "/ticket" }
+  ];
+
   return (
     <div className="flex flex-col min-h-screen">
-      {/* Navigation with glass effect */}
       <nav className="fixed w-full z-50 bg-white/80 backdrop-blur-md border-b">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <div className="flex items-center space-x-2">
-            <div className="flex items-center gap-2">
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex justify-between items-center">
+            <div className="flex items-center space-x-2">
               <Image
                 src="/images/PH.png"
                 alt="PH Logo"
@@ -93,80 +131,113 @@ export default function Home() {
                 className="h-12 w-auto"
               />
             </div>
-          </div>
-          
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex space-x-8">
-            <button 
-              onClick={() => scrollToSection('about')}
-              className="text-sm font-medium hover:text-blue-600 transition-colors"
-            >
-              About us
-            </button>
-            <Link href="/admin/events" className="text-sm font-medium hover:text-blue-600 transition-colors">
-              Events
-            </Link>
-            <button 
-              onClick={() => scrollToSection('speakers')}
-              className="text-sm font-medium hover:text-blue-600 transition-colors"
-            >
-              Speakers
-            </button>
-            <Link href="/ticket" className="text-sm font-medium hover:text-blue-600 transition-colors">
-              Tickets
-            </Link>
-          </div>
+            
+            {/* Desktop Navigation */}
+            <div className="hidden md:flex items-center space-x-8">
+              {navItems.map((item, index) => (
+                item.href ? (
+                  <Link 
+                    key={index}
+                    href={item.href} 
+                    className="text-sm font-medium text-gray-600 hover:text-blue-600 transition-colors duration-200"
+                  >
+                    {item.label}
+                  </Link>
+                ) : (
+                  <button 
+                    key={index}
+                    onClick={item.action}
+                    className="text-sm font-medium text-gray-600 hover:text-blue-600 transition-colors duration-200"
+                  >
+                    {item.label}
+                  </button>
+                )
+              ))}
+              <Link href="/contact">
+                <Button className="bg-[#2562FF] hover:bg-blue-700 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-blue-500/25">
+                  Contact Us
+                </Button>
+              </Link>
+            </div>
 
-          {/* Mobile Menu Button */}
-          <div className="md:hidden flex items-center gap-4">
-            <Button 
-              variant="ghost" 
-              size="icon"
+            {/* Mobile Menu Button */}
+            <button 
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="text-gray-600"
+              className="md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
+              aria-label="Toggle menu"
             >
-              <Menu className="h-6 w-6" />
-            </Button>
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={isMenuOpen ? "close" : "menu"}
+                  initial={{ opacity: 0, rotate: -90 }}
+                  animate={{ opacity: 1, rotate: 0 }}
+                  exit={{ opacity: 0, rotate: 90 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  {isMenuOpen ? (
+                    <X className="h-6 w-6 text-gray-600" />
+                  ) : (
+                    <Menu className="h-6 w-6 text-gray-600" />
+                  )}
+                </motion.div>
+              </AnimatePresence>
+            </button>
           </div>
-
-          <Button className="hidden md:flex bg-[#2562FF] hover:bg-blue-700 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-blue-500/25">
-            Contact Us
-          </Button>
         </div>
 
         {/* Mobile Navigation */}
-        {isMenuOpen && (
-          <motion.div 
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="md:hidden bg-white border-t"
-          >
-            <div className="flex flex-col p-4 space-y-4">
-              <button 
-                onClick={() => scrollToSection('about')}
-                className="text-sm font-medium hover:text-blue-600 transition-colors py-2"
-              >
-                About us
-              </button>
-              <Link href="/admin/events" className="text-sm font-medium hover:text-blue-600 transition-colors py-2">
-                Events
-              </Link>
-              <button 
-                onClick={() => scrollToSection('speakers')}
-                className="text-sm font-medium hover:text-blue-600 transition-colors py-2"
-              >
-                Speakers
-              </button>
-              <Link href="/ticket" className="text-sm font-medium hover:text-blue-600 transition-colors py-2">
-                Tickets
-              </Link>
-              <Button className="w-full bg-[#2562FF] hover:bg-blue-700">
-                Contact Us
-              </Button>
-            </div>
-          </motion.div>
-        )}
+        <AnimatePresence>
+          {isMenuOpen && (
+            <motion.div
+              initial="closed"
+              animate="open"
+              exit="closed"
+              variants={menuVariants}
+              className="md:hidden bg-white border-t overflow-hidden"
+            >
+              <motion.div className="container mx-auto px-4 py-6 space-y-6">
+                {navItems.map((item, index) => (
+                  <motion.div
+                    key={index}
+                    custom={index}
+                    variants={menuItemVariants}
+                    className="border-b border-gray-100 last:border-0"
+                  >
+                    {item.href ? (
+                      <Link
+                        href={item.href}
+                        className="block py-3 text-gray-600 hover:text-blue-600 transition-colors duration-200 text-lg font-medium"
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        {item.label}
+                      </Link>
+                    ) : (
+                      <button
+                        onClick={item.action}
+                        className="block w-full text-left py-3 text-gray-600 hover:text-blue-600 transition-colors duration-200 text-lg font-medium"
+                      >
+                        {item.label}
+                      </button>
+                    )}
+                  </motion.div>
+                ))}
+                <motion.div
+                  variants={menuItemVariants}
+                  custom={navItems.length}
+                >
+                  <Link href="/contact">
+                    <Button 
+                      className="w-full bg-[#2562FF] hover:bg-blue-700 transition-all duration-300"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      Contact Us
+                    </Button>
+                  </Link>
+                </motion.div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </nav>
 
       {/* Hero Section */}
@@ -211,13 +282,15 @@ export default function Home() {
                 >
                   Get Tickets <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
-                <Button 
-                  className="text-white border-white hover:bg-white text-black hover:text-gray-400 transition-all duration-300 transform hover:scale-105 shadow-lg w-full sm:w-auto" 
-                  size="lg" 
-                  variant="outline"
-                >
-                  Book a stand
-                </Button>
+                <Link href="/ticket/stand">
+                  <Button 
+                    className="text-white border-white hover:bg-white text-black hover:text-gray-400 transition-all duration-300 transform hover:scale-105 shadow-lg w-full sm:w-auto" 
+                    size="lg" 
+                    variant="outline"
+                  >
+                    Book a stand
+                  </Button>
+                </Link>
               </motion.div>
             </motion.div>
 
