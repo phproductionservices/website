@@ -14,9 +14,9 @@ const tickets = [
     customerName: "Olivia Rhye",
     ticketNumber: "TKT-2024-001",
     ticketType: "VIP",
-    phoneNumber: "+1 (555) 000-0000",
+    phoneNumber: "07362216165",
     date: "2024-03-15",
-    amount: "$250.00",
+    amount: "£250.00",
     status: "Paid"
   },
   {
@@ -24,9 +24,9 @@ const tickets = [
     customerName: "Phoenix Baker",
     ticketNumber: "TKT-2024-002",
     ticketType: "Regular",
-    phoneNumber: "+1 (555) 000-0001",
+    phoneNumber: "07362216165",
     date: "2024-03-15",
-    amount: "$120.00",
+    amount: "£120.00",
     status: "Pending"
   },
   {
@@ -34,9 +34,9 @@ const tickets = [
     customerName: "Lana Steiner",
     ticketNumber: "TKT-2024-003",
     ticketType: "Group",
-    phoneNumber: "+1 (555) 000-0002",
+    phoneNumber: "07362216165",
     date: "2024-03-16",
-    amount: "$500.00",
+    amount: "£500.00",
     status: "Paid"
   },
   {
@@ -44,9 +44,9 @@ const tickets = [
     customerName: "Demi Wilkinson",
     ticketNumber: "TKT-2024-004",
     ticketType: "Regular",
-    phoneNumber: "+1 (555) 000-0003",
+    phoneNumber: "07362216165",
     date: "2024-03-16",
-    amount: "$120.00",
+    amount: "£120.00",
     status: "Cancelled"
   },
   {
@@ -54,9 +54,9 @@ const tickets = [
     customerName: "Candice Wu",
     ticketNumber: "TKT-2024-005",
     ticketType: "VIP",
-    phoneNumber: "+1 (555) 000-0004",
+    phoneNumber: "07362216165",
     date: "2024-03-17",
-    amount: "$250.00",
+    amount: "£250.00",
     status: "Paid"
   }
 ];

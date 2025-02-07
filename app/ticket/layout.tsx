@@ -15,13 +15,13 @@ export default function TicketLayout({
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <div className="flex items-center space-x-2">
             <Image
-              src="/images/PH.png"
-              alt="Actos Logo"
-              width={32}
-              height={32}
-              className="w-8 h-8"
+              src="/images/PH_White.png"
+              alt="PH Logo"
+              width={30}
+              height={30}
+              className="w-20 h-8"
             />
-            <span className="font-bold text-xl">Actos</span>
+            
           </div>
           <div className="hidden md:flex space-x-6">
             <Link href="#" className="text-sm font-medium">About us</Link>

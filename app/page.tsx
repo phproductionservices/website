@@ -87,7 +87,7 @@ export default function Home() {
             <div className="flex items-center gap-2">
               <Image
                 src="/images/PH.png"
-                alt="Actos Logo"
+                alt="PH Logo"
                 width={48}
                 height={48}
                 className="h-12 w-auto"
@@ -361,10 +361,10 @@ export default function Home() {
             <div>
               <div className="flex items-center space-x-2 mb-6">
                 <Zap className="w-8 h-8 text-blue-600" />
-                <span className="font-bold text-xl">Actos</span>
+                <span className="font-bold text-xl">PH Productions</span>
               </div>
               <p className="text-gray-400">info@example.com</p>
-              <p className="text-gray-400">+1(555) 000-0000</p>
+              <p className="text-gray-400">01782 971 014</p>
             </div>
             <div>
               <h4 className="font-semibold mb-4">Quick Links</h4>

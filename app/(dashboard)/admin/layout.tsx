@@ -27,13 +27,13 @@ export default function AdminLayout({
       <div className="fixed inset-y-0 flex w-64 flex-col bg-[#27264E]">
         <div className="flex h-16 items-center gap-2 px-4">
           <Image
-            src="/images/PH.png"
-            alt="Actos Logo"
+            src="/images/PH_White.png"
+            alt="PH Logo"
             width={32}
             height={32}
-            className="w-8 h-8"
+            className="w-20 h-8"
           />
-          <span className="font-bold text-xl text-white">Actos</span>
+          
         </div>
 
         <div className="flex flex-1 flex-col">

@@ -38,14 +38,14 @@ export default function LoginPage() {
             transition={{ duration: 0.5 }}
           >
             <div className="flex items-center gap-2 mb-8">
-              <Image
-                src="/images/PH.png"
-                alt="Actos Logo"
-                width={40}
-                height={40}
-                className="w-10 h-10"
-              />
-              <span className="font-bold text-2xl">Actos</span>
+            
+    <Image
+                  src="/images/PH.png"
+                  alt="PH Logo"
+                  width={30}
+                  height={30}
+                  className="w-20 h-8"
+                />
             </div>
 
             <h2 className="text-3xl font-bold mb-2">Welcome back</h2>
