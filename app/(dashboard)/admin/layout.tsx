@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { Home, BarChart2, Ticket, Settings, LogOut } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import Image from "next/image";
 
 const navigation = [
   { name: "Home", href: "/admin", icon: Home },
@@ -25,8 +26,14 @@ export default function AdminLayout({
       {/* Sidebar */}
       <div className="fixed inset-y-0 flex w-64 flex-col bg-[#27264E]">
         <div className="flex h-16 items-center gap-2 px-4">
-          <div className="w-8 h-8 bg-blue-600 rounded-full"></div>
-          <span className="font-bold text-xl text-white">Actos</span>
+          <Image
+            src="/images/PH_White.png"
+            alt="PH Logo"
+            width={32}
+            height={32}
+            className="w-20 h-8"
+          />
+          
         </div>
 
         <div className="flex flex-1 flex-col">
