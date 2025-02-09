@@ -276,12 +276,14 @@ export default function Home() {
                 variants={fadeInUp}
                 className="flex flex-col sm:flex-row gap-4"
               >
+               <Link href="/ticket">
                 <Button 
                   className="bg-[#2562FF] hover:bg-blue-700 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-blue-500/25 w-full sm:w-auto" 
                   size="lg"
                 >
                   Get Tickets <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
+                </Link>
                 <Link href="/ticket/stand">
                   <Button 
                     className="text-white border-white hover:bg-white text-black hover:text-gray-400 transition-all duration-300 transform hover:scale-105 shadow-lg w-full sm:w-auto" 

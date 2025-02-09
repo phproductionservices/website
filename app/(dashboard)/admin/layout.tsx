@@ -77,9 +77,11 @@ export default function AdminLayout({
                   <p className="text-xs text-gray-400">olivia@untitledui.com</p>
                 </div>
               </div>
+              <Link href="/login"> 
               <button className="text-gray-400 hover:text-white">
                 <LogOut className="h-5 w-5" />
               </button>
+              </Link>
             </div>
           </div>
         </div>
