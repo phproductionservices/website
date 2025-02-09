@@ -2,6 +2,7 @@
 
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function TicketLayout({
   children,
@@ -13,8 +14,14 @@ export default function TicketLayout({
       <nav className="border-b">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-blue-600 rounded-full"></div>
-            <span className="font-bold text-xl">Actos</span>
+            <Image
+              src="/images/PH_White.png"
+              alt="PH Logo"
+              width={30}
+              height={30}
+              className="w-20 h-8"
+            />
+            
           </div>
           <div className="hidden md:flex space-x-6">
             <Link href="#" className="text-sm font-medium">About us</Link>
