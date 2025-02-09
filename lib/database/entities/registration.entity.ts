@@ -1,22 +1,21 @@
-import { Entity, Column, ManyToOne, Relation, JoinColumn } from "typeorm";
+import { Entity, ManyToOne, JoinColumn } from "typeorm";
 import { BaseEntity } from "./base.entity";
-import { User } from "./user.entity";
-import { Event } from "./event.entity";
-import { Ticket } from "./ticket.entity";
-import { Workshop } from "./workshop.entity";
 
 @Entity()
 export class Registration extends BaseEntity {
+  @ManyToOne("User", "registrations")
+  @JoinColumn()
+  user!: any;
 
-  @ManyToOne(() => User, (user) => user.registration)
-  user!: User;
+  @ManyToOne("Event", "registrations")
+  @JoinColumn()
+  event!: any;
 
-  @ManyToOne(() => Ticket, (ticket) => ticket.registrations)
-  ticket!: Ticket;
+  @ManyToOne("Ticket", "registrations")
+  @JoinColumn()
+  ticket!: any;
 
-  @ManyToOne(() => Workshop, (workshop) => workshop.registration)
-  workshop!: Workshop;
-  
-  @ManyToOne(() => Event, (event) => event.registrations)
-  event!: Event;
+  @ManyToOne("Workshop", "registrations")
+  @JoinColumn()
+  workshop!: any;
 }

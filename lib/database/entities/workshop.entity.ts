@@ -1,8 +1,7 @@
-import { Entity, Column, ManyToOne, OneToMany, JoinColumn, Relation } from "typeorm";
+import { Entity, Column, ManyToOne, OneToMany, JoinColumn } from "typeorm";
 import { BaseEntity } from "./base.entity";
-import { Event } from "./event.entity";
 import { Registration } from "./registration.entity";
-import { Ticket } from "./ticket.entity";
+import { Speaker } from "./speaker.entity";
 
 @Entity()
 export class Workshop extends BaseEntity {
@@ -21,12 +20,17 @@ export class Workshop extends BaseEntity {
   @Column({ default: false })
   isPaidFor!: boolean;
 
-  @OneToMany(() => Ticket, (ticket) => ticket.workshop)
-  ticket!: Ticket[];
+  @ManyToOne("Event", "workshops")
+  @JoinColumn()
+  event!: any;
+
+  @ManyToOne("Ticket", "workshops")
+  @JoinColumn()
+  ticket!: any;
 
   @OneToMany(() => Registration, (registration) => registration.workshop)
-  registration!: Registration[];
+  registrations!: Registration[];
 
-  // @ManyToOne(() => Event, (event) => event.workshop)
-  // event!: Event;
+  @OneToMany(() => Speaker, (speaker) => speaker.workshop)
+  speakers!: Speaker[];
 }

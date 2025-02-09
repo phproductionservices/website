@@ -1,4 +1,4 @@
-import { Entity, Column, ManyToOne, JoinColumn } from "typeorm";
+import { Entity, Column, ManyToOne } from "typeorm";
 import { BaseEntity } from "./base.entity";
 import { Workshop } from "./workshop.entity";
 
@@ -10,10 +10,9 @@ export class Speaker extends BaseEntity {
   @Column()
   description!: string;
 
-  @Column()
-  imageUrl!: string;
+  @Column({ nullable: true })
+  imageUrl?: string;
 
-  @ManyToOne(() => Workshop, (workshop) => workshop.speakers)
-  @JoinColumn()
-  workshop!: Workshop;
+  @ManyToOne("Workshop", "id",{ nullable: true })
+  workshop?: Workshop;
 }

@@ -20,5 +20,5 @@ export class User extends BaseEntity {
   phone!: string;
 
   @OneToMany(() => Registration, (registration) => registration.user)
-  registrations!: Registration[];
+  registrations?: Registration[];
 }

@@ -1,6 +1,8 @@
 import { Entity, Column, ManyToOne, OneToMany, JoinColumn } from "typeorm";
 import { BaseEntity } from "./base.entity";
+import { Event } from "./event.entity";
 import { Registration } from "./registration.entity";
+import { Workshop } from "./workshop.entity";
 
 @Entity()
 export class Ticket extends BaseEntity {
@@ -9,6 +11,9 @@ export class Ticket extends BaseEntity {
 
   @Column()
   name!: string;
+
+  @Column()
+  slug!: string;
 
   @Column("float")
   price!: number;
@@ -22,13 +27,13 @@ export class Ticket extends BaseEntity {
   @Column()
   salesEndDate!: Date;
 
-  @ManyToOne("Event", "tickets")
+  @ManyToOne(() => Event, (event) => event.tickets, { nullable: true })
   @JoinColumn()
-  event!: any;
+  event?: Event;
 
-  @OneToMany(() => Registration, (registration) => registration.ticket)
-  registrations!: Registration[];
+  @OneToMany(() => Registration, (registration) => registration.ticket, { nullable: true })
+  registrations?: Registration[];
 
-  @OneToMany("Workshop", "ticket")
-  workshops!: any[];
+  @OneToMany(() => Workshop, (workshop) => workshop.ticket, { nullable: true })
+  workshops?: Workshop[];
 }
