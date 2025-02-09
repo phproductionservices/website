@@ -8,15 +8,35 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Calendar, Clock, Users, Image as ImageIcon } from "lucide-react";
+import { Ticket, Eye, Calendar, Clock, User, Image as ImageIcon } from "lucide-react";
+
 
 const steps = [
-  { id: "details", name: "Event details", description: "Enter details of your event" },
-  { id: "schedule", name: "Schedule", description: "Create daily schedule for your event" },
-  { id: "ticket", name: "Ticket", description: "Start collaborating with your team" },
-  { id: "preview", name: "Preview", description: "Review and edit your event" },
-];
-
+  { 
+    id: "details",
+    name: "Event details",
+    description: "Enter details of your event",
+    icon: User
+  },
+  {
+    id: "schedule",
+    name: "Schedule",
+    description: "Create daily schedule for your event",
+    icon: Calendar
+  },
+  {
+    id: "ticket",
+    name: "Ticket",
+    description: "Start collaborating with your team",
+    icon: Ticket
+  },
+  {
+    id: "preview",
+    name: "Preview",
+    description: "Review and edit your event",
+    icon: Eye
+  }
+]
 export default function CreateEventPage() {
   const [currentStep, setCurrentStep] = useState("details");
   const router = useRouter();
@@ -40,44 +60,45 @@ export default function CreateEventPage() {
   return (
     <div className="max-w-5xl mx-auto">
       <div className="mb-8">
-        <nav aria-label="Progress">
-          <ol className="flex items-center">
-            {steps.map((step, stepIdx) => (
-              <li
-                key={step.id}
-                className={`${
-                  stepIdx !== steps.length - 1 ? "pr-8 sm:pr-20" : ""
-                } relative`}
-              >
-                <div className="flex items-center">
-                  <button
-                    onClick={() => setCurrentStep(step.id)}
-                    className={`relative flex h-8 w-8 items-center justify-center rounded-full border-2 ${
-                      step.id === currentStep
-                        ? "border-primary bg-primary text-white"
-                        : "border-gray-300 bg-white"
-                    }`}
-                  >
-                    <span className="h-2.5 w-2.5 rounded-full bg-current" />
-                  </button>
-                  {stepIdx !== steps.length - 1 && (
-                    <div
-                      className={`absolute top-4 h-0.5 w-full ${
-                        steps.findIndex(s => s.id === currentStep) > stepIdx
-                          ? "bg-primary"
-                          : "bg-gray-200"
-                      }`}
-                    />
-                  )}
-                </div>
-                <div className="mt-2">
-                  <span className="text-sm font-medium">{step.name}</span>
-                  <p className="text-sm text-gray-500">{step.description}</p>
-                </div>
-              </li>
-            ))}
-          </ol>
-        </nav>
+      <nav aria-label="Progress">
+  <ol className="flex items-center">
+    {steps.map((step, stepIdx) => {
+      const Icon = step.icon; // Extract the icon component
+      return (
+        <li
+          key={step.id}
+          className={`${stepIdx !== steps.length - 1 ? "pr-8 sm:pr-20" : ""} relative`}
+        >
+          <div className="flex items-center">
+            <button
+              onClick={() => setCurrentStep(step.id)}
+              className={`relative flex h-10 w-10 items-center justify-center rounded-full border-2 ${
+                step.id === currentStep
+                  ? "border-primary bg-primary text-white"
+                  : "border-gray-300 bg-white text-gray-500"
+              }`}
+            >
+              <Icon className="w-5 h-5" /> {/* Render the step icon */}
+            </button>
+            {stepIdx !== steps.length - 1 && (
+              <div
+                className={`absolute top-5 h-0.5 w-full ${
+                  steps.findIndex(s => s.id === currentStep) > stepIdx
+                    ? "bg-primary"
+                    : "bg-gray-200"
+                }`}
+              />
+            )}
+          </div>
+          <div className="mt-2 text-center">
+            <span className="text-sm font-medium">{step.name}</span>
+            <p className="text-sm text-gray-500">{step.description}</p>
+          </div>
+        </li>
+      );
+    })}
+  </ol>
+</nav>
       </div>
 
       <Card className="p-6">
@@ -172,7 +193,7 @@ export default function CreateEventPage() {
                         <Input placeholder="Start time" />
                       </div>
                       <div className="flex items-center gap-2">
-                        <Users className="w-4 h-4 text-gray-500" />
+                        <User className="w-4 h-4 text-gray-500" />
                         <Input placeholder="Speaker" />
                       </div>
                     </div>

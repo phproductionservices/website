@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Clock, MapPin } from "lucide-react";
+import Link from "next/link";
 
 const events = [
   {
@@ -45,7 +46,9 @@ export default function EventsPage() {
     <div className="space-y-8">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-semibold">Events</h1>
+        <Link href = "/admin/events/create">
         <Button>Add new event</Button>
+        </Link>
       </div>
 
       <div className="flex justify-between gap-4">

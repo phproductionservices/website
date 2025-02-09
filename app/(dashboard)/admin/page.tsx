@@ -10,6 +10,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import Link from "next/link";
 
 const data = [
   { name: "Jan", value: 1000 },
@@ -67,9 +68,11 @@ export default function AdminDashboard() {
     <div className="space-y-8">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-semibold">Hi</h1>
+        <Link href="/admin/events/create">
         <Button>
           <Clock className="mr-2 h-4 w-4" /> Add new event
         </Button>
+        </Link>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
