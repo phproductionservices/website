@@ -1,0 +1,19 @@
+import { Entity, Column, ManyToOne, JoinColumn } from "typeorm";
+import { BaseEntity } from "./base.entity";
+import { Workshop } from "./workshop.entity";
+
+@Entity()
+export class Speaker extends BaseEntity {
+  @Column()
+  name!: string;
+
+  @Column()
+  description!: string;
+
+  @Column()
+  imageUrl!: string;
+
+  @ManyToOne(() => Workshop, (workshop) => workshop.speakers)
+  @JoinColumn()
+  workshop!: Workshop;
+}
