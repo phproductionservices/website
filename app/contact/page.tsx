@@ -23,12 +23,12 @@ export default function ContactPage() {
     setIsSubmitting(false);
   };
 
-  const menuItems = [
-    { label: "About us", href: "/#about" },
-    { label: "Events", href: "/admin/events" },
-    { label: "Speakers", href: "/#speakers" },
-    { label: "Tickets", href: "/ticket" }
-  ];
+  // const menuItems = [
+  //   { label: "About us", href: "/#about" },
+  //   { label: "Events", href: "/admin/events" },
+  //   { label: "Speakers", href: "/#speakers" },
+  //   { label: "Tickets", href: "/ticket" }
+  // ];
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -47,7 +47,7 @@ export default function ContactPage() {
             </Link>
             
             {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center space-x-8">
+            {/* <div className="hidden md:flex items-center space-x-8">
               {menuItems.map((item, index) => (
                 <Link 
                   key={index}
@@ -62,7 +62,7 @@ export default function ContactPage() {
                   Contact Us
                 </Button>
               </Link>
-            </div>
+            </div> */}
 
             {/* Mobile Menu Button */}
             <button 
@@ -80,7 +80,7 @@ export default function ContactPage() {
           {/* Mobile Navigation */}
           {isMenuOpen && (
             <div className="md:hidden pt-4 pb-6 border-t mt-4">
-              <div className="flex flex-col space-y-4">
+              {/* <div className="flex flex-col space-y-4">
                 {menuItems.map((item, index) => (
                   <Link
                     key={index}
@@ -91,7 +91,7 @@ export default function ContactPage() {
                     {item.label}
                   </Link>
                 ))}
-              </div>
+              </div> */}
             </div>
           )}
         </div>
