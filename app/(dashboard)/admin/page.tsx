@@ -1,7 +1,9 @@
 "use client";
 
+import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { MoreVertical, Clock, MapPin } from "lucide-react";
 import {
   DropdownMenu,
@@ -29,16 +31,38 @@ const recentEvents = [
     location: "21 Bekwere Wosu St",
     sales: "21,000 sold",
     price: "$12.56",
-    image: "https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=200&h=200&auto=format&fit=crop"
+    image: "https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=200&h=200&auto=format&fit=crop",
+    category: "Conference"
   },
   {
     id: 2,
-    title: "The Premier Conference",
-    time: "10am till 3pm",
-    location: "21 Bekwere Wosu St",
-    sales: "21,000 sold",
-    price: "$12.56",
-    image: "https://images.unsplash.com/photo-1552664730-d307ca884978?w=200&h=200&auto=format&fit=crop"
+    title: "Tech Innovation Summit",
+    time: "9am till 5pm",
+    location: "Silicon Valley Convention Center",
+    sales: "15,000 sold",
+    price: "$25.00",
+    image: "https://images.unsplash.com/photo-1552664730-d307ca884978?w=200&h=200&auto=format&fit=crop",
+    category: "Tech"
+  },
+  {
+    id: 3,
+    title: "Music Festival 2024",
+    time: "2pm till 11pm",
+    location: "Central Park",
+    sales: "30,000 sold",
+    price: "$45.00",
+    image: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=200&h=200&auto=format&fit=crop",
+    category: "Music"
+  },
+  {
+    id: 4,
+    title: "Business Leadership Forum",
+    time: "8am till 4pm",
+    location: "Grand Hotel Conference Center",
+    sales: "5,000 sold",
+    price: "$150.00",
+    image: "https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=200&h=200&auto=format&fit=crop",
+    category: "Business"
   }
 ];
 
@@ -64,15 +88,48 @@ const ticketSales = [
 ];
 
 export default function AdminDashboard() {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("All");
+
+  // Filter events based on search query and category
+  const filteredEvents = recentEvents.filter(event => {
+    const matchesSearch = event.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         event.location.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesCategory = selectedCategory === "All" || event.category === selectedCategory;
+    return matchesSearch && matchesCategory;
+  });
+
+  // Get unique categories from events
+  const categories = ["All", ...new Set(recentEvents.map(event => event.category))];
+
   return (
     <div className="space-y-8">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-semibold">Hi</h1>
         <Link href="/admin/events/create">
-        <Button>
-          <Clock className="mr-2 h-4 w-4" /> Add new event
-        </Button>
+          <Button>
+            <Clock className="mr-2 h-4 w-4" /> Add new event
+          </Button>
         </Link>
+      </div>
+
+      {/* Search and Filter Section */}
+      <div className="flex gap-4 items-center">
+        <Input
+          placeholder="Search events..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="max-w-md"
+        />
+        <select
+          className="border rounded-md p-2"
+          value={selectedCategory}
+          onChange={(e) => setSelectedCategory(e.target.value)}
+        >
+          {categories.map(category => (
+            <option key={category} value={category}>{category}</option>
+          ))}
+        </select>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -140,7 +197,7 @@ export default function AdminDashboard() {
       <div>
         <h2 className="text-lg font-semibold mb-4">Recently created events</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {recentEvents.map((event) => (
+          {filteredEvents.map((event) => (
             <Card key={event.id} className="p-4">
               <div className="flex gap-4">
                 <img
@@ -150,7 +207,10 @@ export default function AdminDashboard() {
                 />
                 <div className="flex-1">
                   <div className="flex justify-between items-start">
-                    <h3 className="font-semibold">{event.title}</h3>
+                    <div>
+                      <h3 className="font-semibold">{event.title}</h3>
+                      <span className="text-sm text-blue-600">{event.category}</span>
+                    </div>
                     <span className="text-blue-600 font-semibold">{event.price}</span>
                   </div>
                   <div className="flex items-center text-sm text-gray-500 mt-2">
@@ -169,6 +229,11 @@ export default function AdminDashboard() {
             </Card>
           ))}
         </div>
+        {filteredEvents.length === 0 && (
+          <div className="text-center py-8 text-gray-500">
+            No events found matching your search criteria
+          </div>
+        )}
       </div>
 
       <div>

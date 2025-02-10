@@ -1,7 +1,7 @@
 "use client";
 
 import { ArrowLeft } from "lucide-react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 
 export default function TicketLayout({
@@ -9,6 +9,8 @@ export default function TicketLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const router = useRouter();
+
   return (
     <div className="min-h-screen bg-white">
       <nav className="border-b">
@@ -21,25 +23,24 @@ export default function TicketLayout({
               height={30}
               className="w-20 h-8"
             />
-            
           </div>
-          <div className="hidden md:flex space-x-6">
-            <Link href="#" className="text-sm font-medium">About us</Link>
-            <Link href="#" className="text-sm font-medium">Events</Link>
-            <Link href="#" className="text-sm font-medium">Speakers</Link>
-            <Link href="#" className="text-sm font-medium">Blogs</Link>
-            <Link href="#" className="text-sm font-medium">Tickets</Link>
-          </div>
-          <Link href="/contact" className="bg-[#27264E] text-white px-4 py-2 rounded-lg">
+          <div className="hidden md:flex space-x-6"></div>
+          <button
+            onClick={() => router.push("/contact")}
+            className="bg-[#27264E] text-white px-4 py-2 rounded-lg"
+          >
             Contact us
-          </Link>
+          </button>
         </div>
       </nav>
       <div className="container mx-auto px-4 py-8">
-        <Link href="/" className="inline-flex items-center text-sm mb-8">
+        <button
+          onClick={() => router.back()}
+          className="inline-flex items-center text-sm mb-8 text-blue-600 hover:text-blue-800"
+        >
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back
-        </Link>
+        </button>
         {children}
       </div>
     </div>

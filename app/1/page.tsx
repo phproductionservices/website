@@ -284,15 +284,6 @@ export default function Home() {
                   Get Tickets <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
                 </Link>
-                {/* <Link href="/ticket/stand">
-                  <Button 
-                    className="text-white border-white hover:bg-white text-black hover:text-gray-400 transition-all duration-300 transform hover:scale-105 shadow-lg w-full sm:w-auto" 
-                    size="lg" 
-                    variant="outline"
-                  >
-                    Book a stand
-                  </Button>
-                </Link> */}
               </motion.div>
             </motion.div>
 
@@ -314,30 +305,7 @@ export default function Home() {
                 <div className="absolute inset-0 bg-gradient-to-br from-blue-900/30 to-transparent"></div>
               </div>
 
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5 }}
-                className="absolute bottom-8 left-8 right-8 bg-white/10 backdrop-blur-lg rounded-xl p-4 md:p-6 z-30"
-              >
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between text-white gap-4">
-                  <div className="flex items-center gap-4">
-                    <div className="p-3 bg-blue-600/20 rounded-lg">
-                      <CalendarDays className="w-6 h-6" />
-                    </div>
-                    <div>
-                      <p className="font-medium">Next Event</p>
-                      <p className="text-sm text-gray-300">March 15-18, 2024</p>
-                    </div>
-                  </div>
-                  <Button 
-                    variant="outline" 
-                    className="border-white/20 text-white hover:bg-white/10 text-black w-full sm:w-auto"
-                  >
-                    Get Ticket Now
-                  </Button>
-                </div>
-              </motion.div>
+           
             </motion.div>
           </div>
         </div>
@@ -438,7 +406,7 @@ export default function Home() {
                 <Zap className="w-8 h-8 text-blue-600" />
                 <span className="font-bold text-xl">PH Productions</span>
               </div>
-              <p className="text-gray-400">info@example.com</p>
+              <p className="text-gray-400">info@phproductionservices@co.uk</p>
               <p className="text-gray-400">01782 971 014</p>
             </div>
             <div>
