@@ -3,57 +3,37 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  CalendarDays,
-  Clock,
-  MapPin,
-  ArrowRight,
-  Zap,
-  Menu,
-  X,
-} from "lucide-react";
+import { CalendarDays, Clock, MapPin, ArrowRight, Zap, Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useInView } from "react-intersection-observer";
 import Link from "next/link";
 import { useState } from "react";
 import Image from "next/image";
 
-const events = [
+const speakers = [
   {
-    id: 1,
-    title: "The Premier Conference",
-    time: "10am till 3pm",
-    location: "21 Bekwere Wosu St",
-    price: "$12.56",
-    image:
-      "https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=300&h=200&auto=format&fit=crop",
+    name: "Amelia Laurent",
+    role: "Founder & CEO",
+    company: "Former co-founder of Chainstack. Early start at Spotify and Clearbit",
+    image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=400&h=400&auto=format&fit=crop",
   },
   {
-    id: 2,
-    title: "The Premier Conference",
-    time: "10am till 3pm",
-    location: "21 Bekwere Wosu St",
-    price: "$12.56",
-    image:
-      "https://images.unsplash.com/photo-1552664730-d307ca884978?w=300&h=200&auto=format&fit=crop",
+    name: "Nicolas Ochieng",
+    role: "Engineering Manager",
+    company: "Lead engineering team at Figma, Proto and Product Labs",
+    image: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?q=80&w=400&h=400&auto=format&fit=crop",
   },
   {
-    id: 3,
-    title: "The Premier Conference",
-    time: "10am till 3pm",
-    location: "21 Bekwere Wosu St",
-    price: "$12.56",
-    image:
-      "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=300&h=200&auto=format&fit=crop",
+    name: "Sienna Hewitt",
+    role: "Product Manager",
+    company: "Former PM for Linear. Previously Stripe and DrChrono",
+    image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=400&h=400&auto=format&fit=crop",
   },
   {
-    id: 4,
-    title: "The Premier Conference",
-    time: "10am till 3pm",
-    location: "21 Bekwere Wosu St",
-    price: "$12.56",
-    image:
-      "https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=300&h=200&auto=format&fit=crop",
+    name: "Lily-Rose Charley",
+    role: "Frontend Developer",
+    company: "Senior Developer for Linear, Coinbase, and Postscript",
+    image: "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?q=80&w=400&h=400&auto=format&fit=crop",
   },
 ];
 
@@ -85,7 +65,7 @@ export default function Home() {
     threshold: 0.2,
   });
 
-  const [eventsRef, speakersInView] = useInView({
+  const [speakersRef, speakersInView] = useInView({
     triggerOnce: true,
     threshold: 0.2,
   });
@@ -93,7 +73,7 @@ export default function Home() {
   const scrollToSection = (id: string) => {
     const element = document.getElementById(id);
     if (element) {
-      element.scrollIntoView({ behavior: "smooth" });
+      element.scrollIntoView({ behavior: 'smooth' });
     }
     setIsMenuOpen(false);
   };
@@ -104,17 +84,17 @@ export default function Home() {
       height: 0,
       transition: {
         duration: 0.3,
-        ease: "easeInOut",
-      },
+        ease: "easeInOut"
+      }
     },
     open: {
       opacity: 1,
       height: "auto",
       transition: {
         duration: 0.3,
-        ease: "easeInOut",
-      },
-    },
+        ease: "easeInOut"
+      }
+    }
   };
 
   const menuItemVariants = {
@@ -125,16 +105,16 @@ export default function Home() {
       transition: {
         delay: i * 0.1,
         duration: 0.3,
-        ease: "easeOut",
-      },
-    }),
+        ease: "easeOut"
+      }
+    })
   };
 
   const navItems = [
-    { label: "About us", action: () => scrollToSection("about") },
+    { label: "About us", action: () => scrollToSection('about') },
     { label: "Events", href: "/admin/events" },
-    { label: "Speakers", action: () => scrollToSection("speakers") },
-    { label: "Tickets", href: "/ticket" },
+    { label: "Speakers", action: () => scrollToSection('speakers') },
+    { label: "Tickets", href: "/ticket" }
   ];
 
   return (
@@ -151,20 +131,20 @@ export default function Home() {
                 className="h-12 w-auto"
               />
             </div>
-
+            
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center space-x-8">
-              {navItems.map((item, index) =>
+              {navItems.map((item, index) => (
                 item.href ? (
-                  <Link
+                  <Link 
                     key={index}
-                    href={item.href}
+                    href={item.href} 
                     className="text-sm font-medium text-gray-600 hover:text-blue-600 transition-colors duration-200"
                   >
                     {item.label}
                   </Link>
                 ) : (
-                  <button
+                  <button 
                     key={index}
                     onClick={item.action}
                     className="text-sm font-medium text-gray-600 hover:text-blue-600 transition-colors duration-200"
@@ -172,7 +152,7 @@ export default function Home() {
                     {item.label}
                   </button>
                 )
-              )}
+              ))}
               <Link href="/contact">
                 <Button className="bg-[#2562FF] hover:bg-blue-700 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-blue-500/25">
                   Contact Us
@@ -181,7 +161,7 @@ export default function Home() {
             </div>
 
             {/* Mobile Menu Button */}
-            <button
+            <button 
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               className="md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
               aria-label="Toggle menu"
@@ -246,7 +226,7 @@ export default function Home() {
                   custom={navItems.length}
                 >
                   <Link href="/contact">
-                    <Button
+                    <Button 
                       className="w-full bg-[#2562FF] hover:bg-blue-700 transition-all duration-300"
                       onClick={() => setIsMenuOpen(false)}
                     >
@@ -263,23 +243,28 @@ export default function Home() {
       {/* Hero Section */}
       <section className="relative bg-[#1e1e1e] min-h-screen flex items-center pt-16 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-blue-900/20 via-[#1e1e1e] to-[#1e1e1e]"></div>
-
+        
         <div className="container mx-auto px-4 relative z-10">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <motion.div
+            <motion.div 
               initial="hidden"
               animate="visible"
               variants={staggerChildren}
               className="flex flex-col justify-center text-white"
             >
-              <motion.h1
+              <motion.div
+                variants={fadeInUp}
+                className="inline-block mb-4 px-4 py-1 rounded-full bg-blue-600/10 border border-blue-500/20"
+              >
+                <span className="text-blue-400">2024 Premier Tech Conference</span>
+              </motion.div>
+              <motion.h1 
                 variants={fadeInUp}
                 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6 bg-clip-text text-transparent bg-gradient-to-r from-white via-gray-100 to-gray-300"
               >
-                Welcome to <br />
-                PH Production Services LTD
+                The Premier Professional Conference of the Year
               </motion.h1>
-              <motion.p
+              <motion.p 
                 variants={fadeInUp}
                 className="text-lg md:text-xl text-gray-300 mb-8"
               >
@@ -287,17 +272,17 @@ export default function Home() {
                 entrepreneurs in the heart of NYC. 12th year running, this
                 conference covers all things digital and innovation.
               </motion.p>
-              <motion.div
+              <motion.div 
                 variants={fadeInUp}
                 className="flex flex-col sm:flex-row gap-4"
               >
-                <Link href="/ticket">
-                  <Button
-                    className="bg-[#2562FF] hover:bg-blue-700 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-blue-500/25 w-full sm:w-auto"
-                    size="lg"
-                  >
-                    Get Tickets <ArrowRight className="ml-2 h-4 w-4" />
-                  </Button>
+               <Link href="/ticket">
+                <Button 
+                  className="bg-[#2562FF] hover:bg-blue-700 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-blue-500/25 w-full sm:w-auto" 
+                  size="lg"
+                >
+                  Get Tickets <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
                 </Link>
                 {/* <Link href="/ticket/stand">
                   <Button 
@@ -311,7 +296,7 @@ export default function Home() {
               </motion.div>
             </motion.div>
 
-            <motion.div
+            <motion.div 
               initial={{ opacity: 0, x: 100 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8 }}
@@ -319,7 +304,7 @@ export default function Home() {
             >
               <div className="absolute inset-0 bg-gradient-to-r from-[#1e1e1e] via-transparent to-transparent w-[20%] z-20"></div>
               <div className="absolute inset-0 bg-gradient-to-t from-[#1e1e1e] via-transparent to-transparent h-[20%] bottom-0 z-20"></div>
-
+              
               <div className="absolute inset-0 overflow-hidden rounded-2xl lg:rounded-l-[3rem]">
                 <img
                   src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=2070&auto=format&fit=crop"
@@ -345,8 +330,8 @@ export default function Home() {
                       <p className="text-sm text-gray-300">March 15-18, 2024</p>
                     </div>
                   </div>
-                  <Button
-                    variant="outline"
+                  <Button 
+                    variant="outline" 
                     className="border-white/20 text-white hover:bg-white/10 text-black w-full sm:w-auto"
                   >
                     Get Ticket Now
@@ -359,13 +344,9 @@ export default function Home() {
       </section>
 
       {/* About Section with Reveal on Scroll */}
-      <section
-        id="about"
-        ref={aboutRef}
-        className="bg-gray-50 py-32 scroll-mt-16"
-      >
+      <section id="about" ref={aboutRef} className="bg-gray-50 py-32 scroll-mt-16">
         <div className="container mx-auto px-4">
-          <motion.div
+          <motion.div 
             initial="hidden"
             animate={aboutInView ? "visible" : "hidden"}
             variants={staggerChildren}
@@ -405,47 +386,43 @@ export default function Home() {
       </section>
 
       {/* Speakers Section with Card Animations */}
-      <section id="events" ref={eventsRef} className="py-32 scroll-mt-16">
+      <section id="speakers" ref={speakersRef} className="py-32 scroll-mt-16">
         <div className="container mx-auto px-4">
-          <motion.h2
+          <motion.h2 
             initial={{ opacity: 0, y: 20 }}
             animate={speakersInView ? { opacity: 1, y: 0 } : {}}
             className="text-4xl font-bold mb-16 text-center"
           >
-            Recent Events
+            Meet Our Speakers
           </motion.h2>
-          <motion.div
+          <motion.div 
             initial="hidden"
             animate={speakersInView ? "visible" : "hidden"}
             variants={staggerChildren}
             className="grid md:grid-cols-2 lg:grid-cols-4 gap-8"
           >
-            {events.map((event) => (
+            {speakers.map((speaker, index) => (
               <motion.div
-                key={event.id}
+                key={speaker.name}
                 variants={fadeInUp}
                 whileHover={{ y: -10 }}
                 transition={{ duration: 0.3 }}
               >
-                <Link href={`/${event.id}`}>
-                  <Card className="overflow-hidden group">
-                    <div className="relative overflow-hidden">
-                      <img
-                        src={event.image}
-                        alt={event.title}
-                        className="w-full h-64 object-cover transform group-hover:scale-110 transition-transform duration-500"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                    </div>
-                    <div className="p-6">
-                      <h3 className="font-bold text-lg mb-1">{event.title}</h3>
-                      <p className="text-blue-600 text-sm mb-2">
-                        {event.location}
-                      </p>
-                      <p className="text-gray-600 text-sm">{event.time}</p>
-                    </div>
-                  </Card>
-                </Link>
+                <Card className="overflow-hidden group">
+                  <div className="relative overflow-hidden">
+                    <img
+                      src={speaker.image}
+                      alt={speaker.name}
+                      className="w-full h-64 object-cover transform group-hover:scale-110 transition-transform duration-500"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  </div>
+                  <div className="p-6">
+                    <h3 className="font-bold text-lg mb-1">{speaker.name}</h3>
+                    <p className="text-blue-600 text-sm mb-2">{speaker.role}</p>
+                    <p className="text-gray-600 text-sm">{speaker.company}</p>
+                  </div>
+                </Card>
               </motion.div>
             ))}
           </motion.div>
@@ -468,34 +445,28 @@ export default function Home() {
               <h4 className="font-semibold mb-4">Quick Links</h4>
               <ul className="space-y-2 text-gray-400">
                 <li>
-                  <button
-                    onClick={() => scrollToSection("about")}
+                  <button 
+                    onClick={() => scrollToSection('about')}
                     className="hover:text-white transition-colors cursor-pointer"
                   >
                     About us
                   </button>
                 </li>
                 <li>
-                  <Link
-                    href="/admin/events"
-                    className="hover:text-white transition-colors cursor-pointer"
-                  >
+                  <Link href="/admin/events" className="hover:text-white transition-colors cursor-pointer">
                     Events
                   </Link>
                 </li>
                 <li>
-                  <button
-                    onClick={() => scrollToSection("speakers")}
+                  <button 
+                    onClick={() => scrollToSection('speakers')}
                     className="hover:text-white transition-colors cursor-pointer"
                   >
                     Speakers
                   </button>
                 </li>
                 <li>
-                  <Link
-                    href="/ticket"
-                    className="hover:text-white transition-colors cursor-pointer"
-                  >
+                  <Link href="/ticket" className="hover:text-white transition-colors cursor-pointer">
                     Tickets
                   </Link>
                 </li>
@@ -504,18 +475,10 @@ export default function Home() {
             <div>
               <h4 className="font-semibold mb-4">Resources</h4>
               <ul className="space-y-2 text-gray-400">
-                <li className="hover:text-white transition-colors cursor-pointer">
-                  Terms
-                </li>
-                <li className="hover:text-white transition-colors cursor-pointer">
-                  Privacy
-                </li>
-                <li className="hover:text-white transition-colors cursor-pointer">
-                  Help Center
-                </li>
-                <li className="hover:text-white transition-colors cursor-pointer">
-                  Contact us
-                </li>
+                <li className="hover:text-white transition-colors cursor-pointer">Terms</li>
+                <li className="hover:text-white transition-colors cursor-pointer">Privacy</li>
+                <li className="hover:text-white transition-colors cursor-pointer">Help Center</li>
+                <li className="hover:text-white transition-colors cursor-pointer">Contact us</li>
               </ul>
             </div>
             <div>
