@@ -112,7 +112,7 @@ export default function Home() {
 
   const navItems = [
     { label: "About us", action: () => scrollToSection('about') },
-    { label: "Events", href: "/admin/events" },
+   
     { label: "Speakers", action: () => scrollToSection('speakers') },
     { label: "Tickets", href: "/ticket" }
   ];

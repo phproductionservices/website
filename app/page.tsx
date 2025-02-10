@@ -131,10 +131,9 @@ export default function Home() {
   };
 
   const navItems = [
-    { label: "About us", action: () => scrollToSection("about") },
-    { label: "Events", href: "/admin/events" },
-    { label: "Speakers", action: () => scrollToSection("speakers") },
-    { label: "Tickets", href: "/ticket" },
+    { label: "About us", action: () => scrollToSection("about") , href: undefined},
+    { label: "Events", action: () => scrollToSection("events") },
+   
   ];
 
   return (
@@ -283,22 +282,20 @@ export default function Home() {
                 variants={fadeInUp}
                 className="text-lg md:text-xl text-gray-300 mb-8"
               >
-                Delux is a gathering for thought leaders, inventors, and tech
-                entrepreneurs in the heart of NYC. 12th year running, this
-                conference covers all things digital and innovation.
+                PH Production Services delivers expert design, production, and technical support for live events, performances, and corporate launches—whether you need a single service or a full production solution.
               </motion.p>
               <motion.div
                 variants={fadeInUp}
                 className="flex flex-col sm:flex-row gap-4"
               >
-                <Link href="/ticket">
+                {/* <Link href="/ticket">
                   <Button
                     className="bg-[#2562FF] hover:bg-blue-700 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-blue-500/25 w-full sm:w-auto"
                     size="lg"
                   >
                     Get Tickets <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
-                </Link>
+                </Link> */}
                 {/* <Link href="/ticket/stand">
                   <Button 
                     className="text-white border-white hover:bg-white text-black hover:text-gray-400 transition-all duration-300 transform hover:scale-105 shadow-lg w-full sm:w-auto" 
@@ -329,30 +326,7 @@ export default function Home() {
                 <div className="absolute inset-0 bg-gradient-to-br from-blue-900/30 to-transparent"></div>
               </div>
 
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5 }}
-                className="absolute bottom-8 left-8 right-8 bg-white/10 backdrop-blur-lg rounded-xl p-4 md:p-6 z-30"
-              >
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between text-white gap-4">
-                  <div className="flex items-center gap-4">
-                    <div className="p-3 bg-blue-600/20 rounded-lg">
-                      <CalendarDays className="w-6 h-6" />
-                    </div>
-                    <div>
-                      <p className="font-medium">Next Event</p>
-                      <p className="text-sm text-gray-300">March 15-18, 2024</p>
-                    </div>
-                  </div>
-                  <Button
-                    variant="outline"
-                    className="border-white/20 text-white hover:bg-white/10 text-black w-full sm:w-auto"
-                  >
-                    Get Ticket Now
-                  </Button>
-                </div>
-              </motion.div>
+              
             </motion.div>
           </div>
         </div>
@@ -380,21 +354,17 @@ export default function Home() {
             </motion.div>
             <motion.div variants={fadeInUp} className="space-y-6">
               <h2 className="text-4xl font-bold mb-6">
-                About the Premier Conference 2023
+                About PH Production Services LTD
               </h2>
               <p className="text-gray-600 text-lg leading-relaxed">
-                The Annual Professional Conference is an exciting gathering of
-                industry leaders, tech innovators, and professionals from across
-                the country. This year's event will feature a wide range of
-                sessions and workshops designed to help attendees stay ahead of
-                the curve and achieve their professional goals.
+                From breathtaking theatrical performances to seamless corporate events, 
+                PH Production Services brings your vision to life. We provide expert design,
+                 production, and management for live shows, festivals, exhibitions, and more. 
               </p>
               <p className="text-gray-600 text-lg leading-relaxed">
-                This year's conference will be held at the San Diego Convention
-                Center in San Diego, California. With easy access to
-                transportation, nearby hotels, and a wide range of dining and
-                entertainment options, SDCC is the perfect place to host our
-                premier conference.
+              Whether you need sound, lighting, AV, staging, or live streaming, our skilled technicians 
+              deliver top-tier solutions—choose a single service or let us handle it all. 
+              Elevate your event with PH Production Services.
               </p>
               <Button className="mt-6" variant="outline">
                 Learn More <ArrowRight className="ml-2 h-4 w-4" />
@@ -461,7 +431,7 @@ export default function Home() {
                 <Zap className="w-8 h-8 text-blue-600" />
                 <span className="font-bold text-xl">PH Productions</span>
               </div>
-              <p className="text-gray-400">info@example.com</p>
+              <p className="text-gray-400">info@phproductionservices@co.uk</p>
               <p className="text-gray-400">01782 971 014</p>
             </div>
             <div>
@@ -476,28 +446,12 @@ export default function Home() {
                   </button>
                 </li>
                 <li>
-                  <Link
-                    href="/admin/events"
+                  <button
+                    onClick={() => scrollToSection("events")}
                     className="hover:text-white transition-colors cursor-pointer"
                   >
                     Events
-                  </Link>
-                </li>
-                <li>
-                  <button
-                    onClick={() => scrollToSection("speakers")}
-                    className="hover:text-white transition-colors cursor-pointer"
-                  >
-                    Speakers
                   </button>
-                </li>
-                <li>
-                  <Link
-                    href="/ticket"
-                    className="hover:text-white transition-colors cursor-pointer"
-                  >
-                    Tickets
-                  </Link>
                 </li>
               </ul>
             </div>
@@ -537,7 +491,7 @@ export default function Home() {
             </div>
           </div>
           <div className="border-t border-gray-800 mt-16 pt-8 text-center text-gray-400">
-            <p>© 2024 Actos. All rights reserved.</p>
+            <p>© 2024 PH Productions. All rights reserved.</p>
           </div>
         </div>
       </footer>
