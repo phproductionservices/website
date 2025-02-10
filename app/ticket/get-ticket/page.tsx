@@ -145,7 +145,7 @@ export default function GetTicketPage() {
           <li>Please arrive at least 30 minutes before the event starts</li>
           <li>Bring a valid ID that matches the ticket holder's name</li>
           <li>This ticket is non-transferable and non-refundable</li>
-          <li>For any questions, contact support@example.com</li>
+          <li>For any questions, contact info@phproductionservices@co.uk</li>
         </ul>
       </div>
     </div>
