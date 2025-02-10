@@ -284,7 +284,7 @@ export default function Home() {
                   Get Tickets <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
                 </Link>
-                <Link href="/ticket/stand">
+                {/* <Link href="/ticket/stand">
                   <Button 
                     className="text-white border-white hover:bg-white text-black hover:text-gray-400 transition-all duration-300 transform hover:scale-105 shadow-lg w-full sm:w-auto" 
                     size="lg" 
@@ -292,7 +292,7 @@ export default function Home() {
                   >
                     Book a stand
                   </Button>
-                </Link>
+                </Link> */}
               </motion.div>
             </motion.div>
 
@@ -334,7 +334,7 @@ export default function Home() {
                     variant="outline" 
                     className="border-white/20 text-white hover:bg-white/10 text-black w-full sm:w-auto"
                   >
-                    Register Now
+                    Get Ticket Now
                   </Button>
                 </div>
               </motion.div>
