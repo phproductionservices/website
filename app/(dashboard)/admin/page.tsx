@@ -1,203 +1,596 @@
 "use client";
 
-import { Card } from "@/components/ui/card";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { MoreVertical, Clock, MapPin } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { 
+  Clock, 
+  MapPin, 
+  Search, 
+  Filter, 
+  Users, 
+  Ticket, 
+  ArrowRight,
+  Download,
+  Mail,
+  BarChart2,
+  Calendar,
+  DollarSign,
+  TrendingUp,
+  AlertCircle
+} from "lucide-react";
 import Link from "next/link";
+import { Badge } from "@/components/ui/badge";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer
+} from 'recharts';
 
-const data = [
-  { name: "Jan", value: 1000 },
-  { name: "Feb", value: 1200 },
-  { name: "Mar", value: 900 },
-  { name: "Apr", value: 1500 },
-  { name: "May", value: 1700 },
-  { name: "Jun", value: 1400 },
+const salesData = [
+  { name: "Mon", sales: 2400 },
+  { name: "Tue", sales: 1398 },
+  { name: "Wed", sales: 9800 },
+  { name: "Thu", sales: 3908 },
+  { name: "Fri", sales: 4800 },
+  { name: "Sat", sales: 3800 },
+  { name: "Sun", sales: 4300 }
 ];
 
-const recentEvents = [
+const events = [
   {
     id: 1,
     title: "The Premier Conference",
-    time: "10am till 3pm",
-    location: "21 Bekwere Wosu St",
-    sales: "21,000 sold",
-    price: "$12.56",
-    image: "https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=200&h=200&auto=format&fit=crop"
+    date: "March 15-18, 2024",
+    time: "10:00 AM - 6:00 PM",
+    location: "San Diego Convention Center",
+    category: "Conference",
+    ticketsSold: 350,
+    totalTickets: 500,
+    revenue: "£43,750",
+    image: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&h=500&fit=crop",
+    status: "Active",
+    ticketTypes: [
+      { type: "Early Bird", sold: 100, total: 100, price: "£99" },
+      { type: "Regular", sold: 200, total: 300, price: "£129" },
+      { type: "VIP", sold: 50, total: 100, price: "£299" }
+    ],
+    recentAttendees: [
+      { name: "John Doe", email: "john@example.com", ticketType: "VIP", purchaseDate: "2024-03-01" },
+      { name: "Jane Smith", email: "jane@example.com", ticketType: "Regular", purchaseDate: "2024-03-02" },
+      { name: "Mike Johnson", email: "mike@example.com", ticketType: "Early Bird", purchaseDate: "2024-03-03" }
+    ],
+    analytics: {
+      dailyViews: 1200,
+      conversionRate: "3.5%",
+      averageOrderValue: "£175",
+      topReferrers: ["Google", "Facebook", "Direct"]
+    }
   },
   {
     id: 2,
-    title: "The Premier Conference",
-    time: "10am till 3pm",
-    location: "21 Bekwere Wosu St",
-    sales: "21,000 sold",
-    price: "$12.56",
-    image: "https://images.unsplash.com/photo-1552664730-d307ca884978?w=200&h=200&auto=format&fit=crop"
-  }
-];
-
-const ticketSales = [
-  {
-    event: "Ipsum donec lobortis rhoncus sagittis pellentesque a.",
-    type: "Regular",
-    sold: "300/310",
-    amount: "$12.53"
+    title: "Summer Music Festival",
+    date: "June 21-23, 2024",
+    time: "12:00 PM - 11:00 PM",
+    location: "Riverside Park",
+    category: "Festival",
+    ticketsSold: 1500,
+    totalTickets: 2000,
+    revenue: "£75,000",
+    image: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800&h=500&fit=crop",
+    status: "Upcoming",
+    ticketTypes: [
+      { type: "General Admission", sold: 1000, total: 1500, price: "£49" },
+      { type: "VIP", sold: 500, total: 500, price: "£149" }
+    ]
   },
   {
-    event: "Consequat ac a velit velit libero.",
-    type: "Regular",
-    sold: "2000/2000",
-    amount: "$12.53"
-  },
-  {
-    event: "Mauris gravida sagittis nulla eleifend.",
-    type: "VIP",
-    sold: "100/100",
-    amount: "$12.53"
+    id: 3,
+    title: "Tech Innovation Summit",
+    date: "April 5, 2024",
+    time: "9:00 AM - 5:00 PM",
+    location: "Metropolitan Conference Center",
+    category: "Corporate",
+    ticketsSold: 280,
+    totalTickets: 300,
+    revenue: "£84,000",
+    image: "https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=800&h=500&fit=crop",
+    status: "Almost Sold Out",
+    ticketTypes: [
+      { type: "Professional", sold: 200, total: 200, price: "£299" },
+      { type: "Executive", sold: 80, total: 100, price: "£499" }
+    ]
   }
 ];
 
 export default function AdminDashboard() {
+  const [selectedEvent, setSelectedEvent] = useState<any>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("All");
+  const [activeTab, setActiveTab] = useState("overview");
+  const [showEmailModal, setShowEmailModal] = useState(false);
+
+  const filteredEvents = events.filter(event => {
+    const matchesSearch = event.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         event.location.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesCategory = categoryFilter === "All" || event.category === categoryFilter;
+    return matchesSearch && matchesCategory;
+  });
+
+  const getStatusColor = (status: string) => {
+    switch (status.toLowerCase()) {
+      case 'active':
+        return 'bg-green-100 text-green-800';
+      case 'upcoming':
+        return 'bg-blue-100 text-blue-800';
+      case 'almost sold out':
+        return 'bg-yellow-100 text-yellow-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  const calculateProgress = (sold: number, total: number) => {
+    return (sold / total) * 100;
+  };
+
+  const handleSendEmail = () => {
+    setShowEmailModal(true);
+  };
+
+  const handleDownloadAttendees = () => {
+    // Simulate CSV download
+    const csvContent = "data:text/csv;charset=utf-8,Name,Email,Ticket Type,Purchase Date\n";
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "attendees.csv");
+    document.body.appendChild(link);
+    link.click();
+  };
+
   return (
     <div className="space-y-8">
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-semibold">Hi</h1>
-        <Link href="/admin/events/create">
-        <Button>
-          <Clock className="mr-2 h-4 w-4" /> Add new event
-        </Button>
-        </Link>
-      </div>
+      {!selectedEvent ? (
+        <>
+          <div className="flex justify-between items-center">
+            <h1 className="text-2xl font-semibold">Events</h1>
+            <Link href="/admin/events/create">
+              <Button>Add new event</Button>
+            </Link>
+          </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className="p-6">
-          <div className="flex justify-between items-start mb-4">
-            <div>
-              <p className="text-sm text-gray-500">Today's revenue</p>
-              <h3 className="text-2xl font-bold">$1,280</h3>
+          {/* Analytics Overview */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <Card className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-500">Total Revenue</p>
+                  <p className="text-2xl font-bold">£202,750</p>
+                </div>
+                <DollarSign className="w-8 h-8 text-green-500" />
+              </div>
+              <div className="mt-2 text-sm text-green-500">+12.5% from last month</div>
+            </Card>
+            <Card className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-500">Active Events</p>
+                  <p className="text-2xl font-bold">8</p>
+                </div>
+                <Calendar className="w-8 h-8 text-blue-500" />
+              </div>
+              <div className="mt-2 text-sm text-blue-500">2 starting this week</div>
+            </Card>
+            <Card className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-500">Total Tickets Sold</p>
+                  <p className="text-2xl font-bold">2,130</p>
+                </div>
+                <Ticket className="w-8 h-8 text-purple-500" />
+              </div>
+              <div className="mt-2 text-sm text-purple-500">+5.2% from last week</div>
+            </Card>
+            <Card className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-500">Conversion Rate</p>
+                  <p className="text-2xl font-bold">3.2%</p>
+                </div>
+                <TrendingUp className="w-8 h-8 text-orange-500" />
+              </div>
+              <div className="mt-2 text-sm text-orange-500">+0.8% from last month</div>
+            </Card>
+          </div>
+
+          <div className="flex gap-4">
+            <div className="flex-1 relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+              <Input
+                placeholder="Search events..."
+                className="pl-10"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
             </div>
-            <Button variant="ghost" size="icon">
-              <MoreVertical className="h-4 w-4" />
-            </Button>
+            <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Category" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="All">All Categories</SelectItem>
+                <SelectItem value="Conference">Conference</SelectItem>
+                <SelectItem value="Festival">Festival</SelectItem>
+                <SelectItem value="Corporate">Corporate</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
-          <div className="h-[100px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={data}>
-                <Line type="monotone" dataKey="value" stroke="hsl(var(--chart-1))" strokeWidth={2} dot={false} />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-          <p className="text-sm text-green-600 mt-2">↑ 15% last mth</p>
-        </Card>
 
-        <Card className="p-6">
-          <div className="flex justify-between items-start mb-4">
-            <div>
-              <p className="text-sm text-gray-500">Today's ticket sales</p>
-              <h3 className="text-2xl font-bold">14</h3>
-            </div>
-            <Button variant="ghost" size="icon">
-              <MoreVertical className="h-4 w-4" />
-            </Button>
-          </div>
-          <div className="h-[100px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={data}>
-                <Line type="monotone" dataKey="value" stroke="hsl(var(--chart-2))" strokeWidth={2} dot={false} />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-          <p className="text-sm text-red-600 mt-2">↓ 10% last mth</p>
-        </Card>
-
-        <Card className="p-6">
-          <div className="flex justify-between items-start mb-4">
-            <div>
-              <p className="text-sm text-gray-500">Avg. order value</p>
-              <h3 className="text-2xl font-bold">$91.42</h3>
-            </div>
-            <Button variant="ghost" size="icon">
-              <MoreVertical className="h-4 w-4" />
-            </Button>
-          </div>
-          <div className="h-[100px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={data}>
-                <Line type="monotone" dataKey="value" stroke="hsl(var(--chart-3))" strokeWidth={2} dot={false} />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-          <p className="text-sm text-green-600 mt-2">↑ 20% last mth</p>
-        </Card>
-      </div>
-
-      <div>
-        <h2 className="text-lg font-semibold mb-4">Recently created events</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {recentEvents.map((event) => (
-            <Card key={event.id} className="p-4">
-              <div className="flex gap-4">
-                <img
-                  src={event.image}
-                  alt={event.title}
-                  className="w-24 h-24 object-cover rounded-lg"
-                />
-                <div className="flex-1">
-                  <div className="flex justify-between items-start">
-                    <h3 className="font-semibold">{event.title}</h3>
-                    <span className="text-blue-600 font-semibold">{event.price}</span>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {filteredEvents.map((event) => (
+              <Card 
+                key={event.id} 
+                className="cursor-pointer hover:shadow-lg transition-shadow"
+                onClick={() => setSelectedEvent(event)}
+              >
+                <div className="relative h-48">
+                  <img
+                    src={event.image}
+                    alt={event.title}
+                    className="w-full h-full object-cover rounded-t-lg"
+                  />
+                  <Badge className={`absolute top-4 right-4 ${getStatusColor(event.status)}`}>
+                    {event.status}
+                  </Badge>
+                </div>
+                <div className="p-6">
+                  <div className="flex justify-between items-start mb-4">
+                    <div>
+                      <h3 className="font-semibold text-lg mb-2">{event.title}</h3>
+                      <div className="flex items-center text-sm text-gray-500">
+                        <Clock className="w-4 h-4 mr-1" />
+                        <span>{event.date}</span>
+                      </div>
+                      <div className="flex items-center text-sm text-gray-500 mt-1">
+                        <MapPin className="w-4 h-4 mr-1" />
+                        <span>{event.location}</span>
+                      </div>
+                    </div>
+                    <span className="text-blue-600 font-semibold">{event.revenue}</span>
                   </div>
-                  <div className="flex items-center text-sm text-gray-500 mt-2">
-                    <Clock className="w-4 h-4 mr-1" />
-                    <span>{event.time}</span>
-                  </div>
-                  <div className="flex items-center text-sm text-gray-500 mt-1">
-                    <MapPin className="w-4 h-4 mr-1" />
-                    <span>{event.location}</span>
-                  </div>
-                  <div className="text-sm text-gray-500 mt-1">
-                    {event.sales}
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Tickets Sold</span>
+                      <span>{event.ticketsSold}/{event.totalTickets}</span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div
+                        className="bg-blue-600 rounded-full h-2"
+                        style={{ width: `${calculateProgress(event.ticketsSold, event.totalTickets)}%` }}
+                      />
+                    </div>
                   </div>
                 </div>
+              </Card>
+            ))}
+          </div>
+        </>
+      ) : (
+        <div className="space-y-8">
+          <div className="flex items-center justify-between">
+            <Button variant="ghost" onClick={() => setSelectedEvent(null)}>
+              <ArrowRight className="w-4 h-4 mr-2 rotate-180" />
+              Back to Events
+            </Button>
+            <div className="flex gap-4">
+              <Button variant="outline">Edit Event</Button>
+              <Button variant="destructive">Cancel Event</Button>
+            </div>
+          </div>
+
+          <div className="flex gap-4 border-b">
+            {["overview", "attendees",].map((tab) => (
+              <button
+                key={tab}
+                className={`px-4 py-2 font-medium ${
+                  activeTab === tab
+                    ? "border-b-2 border-blue-600 text-blue-600"
+                    : "text-gray-500"
+                }`}
+                onClick={() => setActiveTab(tab)}
+              >
+                {tab.charAt(0).toUpperCase() + tab.slice(1)}
+              </button>
+            ))}
+          </div>
+
+          {activeTab === "overview" && (
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              <div className="lg:col-span-2 space-y-6">
+                <Card className="p-6">
+                  <img
+                    src={selectedEvent.image}
+                    alt={selectedEvent.title}
+                    className="w-full h-64 object-cover rounded-lg mb-6"
+                  />
+                  <h2 className="text-2xl font-bold mb-4">{selectedEvent.title}</h2>
+                  <div className="grid grid-cols-2 gap-4 mb-6">
+                    <div className="flex items-center text-gray-600">
+                      <Clock className="w-5 h-5 mr-2" />
+                      <div>
+                        <p className="font-medium">Date & Time</p>
+                        <p className="text-sm">{selectedEvent.date}</p>
+                        <p className="text-sm">{selectedEvent.time}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center text-gray-600">
+                      <MapPin className="w-5 h-5 mr-2" />
+                      <div>
+                        <p className="font-medium">Location</p>
+                        <p className="text-sm">{selectedEvent.location}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="mt-6">
+                    <h3 className="text-lg font-semibold mb-4">Recent Activity</h3>
+                    <div className="space-y-4">
+                      {selectedEvent.recentAttendees.map((attendee: any, index: number) => (
+                        <div key={index} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                          <div>
+                            <p className="font-medium">{attendee.name}</p>
+                            <p className="text-sm text-gray-500">{attendee.email}</p>
+                          </div>
+                          <div className="text-right">
+                            <p className="text-sm font-medium">{attendee.ticketType}</p>
+                            <p className="text-sm text-gray-500">{attendee.purchaseDate}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </Card>
+
+                <Card className="p-6">
+                  <h3 className="text-lg font-semibold mb-4">Sales Trend</h3>
+                  <div className="h-[300px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart data={salesData}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="name" />
+                        <YAxis />
+                        <Tooltip />
+                        <Line type="monotone" dataKey="sales" stroke="#2563eb" />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
+                </Card>
+              </div>
+
+              <div className="space-y-6">
+                <Card className="p-6">
+                  <h3 className="text-lg font-semibold mb-4">Event Stats</h3>
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center p-4 bg-gray-50 rounded-lg">
+                      <div className="flex items-center">
+                        <Ticket className="w-5 h-5 text-blue-600 mr-3" />
+                        <div>
+                          <p className="text-sm text-gray-500">Total Sales</p>
+                          <p className="font-semibold">{selectedEvent.revenue}</p>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex justify-between items-center p-4 bg-gray-50 rounded-lg">
+                      <div className="flex items-center">
+                        <Users className="w-5 h-5 text-blue-600 mr-3" />
+                        <div>
+                          <p className="text-sm text-gray-500">Attendance</p>
+                          <p className="font-semibold">
+                            {selectedEvent.ticketsSold}/{selectedEvent.totalTickets}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex justify-between items-center p-4 bg-gray-50 rounded-lg">
+                      <div className="flex items-center">
+                        <BarChart2 className="w-5 h-5 text-blue-600 mr-3" />
+                        <div>
+                          <p className="text-sm text-gray-500">Conversion Rate</p>
+                          <p className="font-semibold">{selectedEvent.analytics.conversionRate}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+
+                <Card className="p-6">
+                  <h3 className="text-lg font-semibold mb-4">Quick Actions</h3>
+                  <div className="space-y-3">
+                    <Button 
+                      className="w-full" 
+                      variant="outline"
+                      onClick={handleDownloadAttendees}
+                    >
+                      <Download className="w-4 h-4 mr-2" />
+                      Download Attendee List
+                    </Button>
+                    <Button 
+                      className="w-full" 
+                      variant="outline"
+                      onClick={handleSendEmail}
+                    >
+                      <Mail className="w-4 h-4 mr-2" />
+                      Send Email to Attendees
+                    </Button>
+                    <Button className="w-full" variant="outline">
+                      <AlertCircle className="w-4 h-4 mr-2" />
+                      View Check-in Status
+                    </Button>
+                  </div>
+                </Card>
+
+                <Card className="p-6">
+                  <h3 className="text-lg font-semibold mb-4">Ticket Types</h3>
+                  <div className="space-y-4">
+                    {selectedEvent.ticketTypes.map((ticket: any, index: number) => (
+                      <div key={index} className="p-4 border rounded-lg">
+                        <div className="flex justify-between items-start mb-2">
+                          <div>
+                            <h4 className="font-medium">{ticket.type}</h4>
+                            <p className="text-sm text-gray-500">Price: {ticket.price}</p>
+                          </div>
+                          <Badge className={getStatusColor(
+                            ticket.sold === ticket.total ? 'Sold Out' : 'Available'
+                          )}>
+                            {ticket.sold === ticket.total ? 'Sold Out' : 'Available'}
+                          </Badge>
+                        </div>
+                        <div className="space-y-2">
+                          <div className="flex justify-between text-sm">
+                            <span>Sold</span>
+                            <span>{ticket.sold}/{ticket.total}</span>
+                          </div>
+                          <div className="w-full bg-gray-200 rounded-full h-2">
+                            <div
+                              className="bg-blue-600 rounded-full h-2"
+                              style={{ width: `${calculateProgress(ticket.sold, ticket.total)}%` }}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </Card>
+              </div>
+            </div>
+          )}
+
+          {activeTab === "analytics" && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <Card className="p-6">
+                <h3 className="text-lg font-semibold mb-6">Traffic Sources</h3>
+                <div className="space-y-4">
+                  {selectedEvent.analytics.topReferrers.map((referrer: string, index: number) => (
+                    <div key={index} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                      <span>{referrer}</span>
+                      <span className="text-blue-600 font-medium">
+                        {Math.floor(Math.random() * 1000)} visits
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </Card>
+              
+              <Card className="p-6">
+                <h3 className="text-lg font-semibold mb-6">Key Metrics</h3>
+                <div className="space-y-4">
+                  <div className="p-4 bg-gray-50 rounded-lg">
+                    <p className="text-sm text-gray-500">Daily Page Views</p>
+                    <p className="text-2xl font-bold">{selectedEvent.analytics.dailyViews}</p>
+                  </div>
+                  <div className="p-4 bg-gray-50 rounded-lg">
+                    <p className="text-sm text-gray-500">Average Order Value</p>
+                    <p className="text-2xl font-bold">{selectedEvent.analytics.averageOrderValue}</p>
+                  </div>
+                </div>
+              </Card>
+            </div>
+          )}
+
+          {activeTab === "attendees" && (
+            <Card className="p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-lg font-semibold">Attendee List</h3>
+                <Button variant="outline" onClick={handleDownloadAttendees}>
+                  <Download className="w-4 h-4 mr-2" />
+                  Export CSV
+                </Button>
+              </div>
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b">
+                      <th className="text-left p-4">Name</th>
+                      <th className="text-left p-4">Email</th>
+                      <th className="text-left p-4">Ticket Type</th>
+                      <th className="text-left p-4">Purchase Date</th>
+                      <th className="text-left p-4">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {selectedEvent.recentAttendees.map((attendee: any, index: number) => (
+                      <tr key={index} className="border-b">
+                        <td className="p-4">{attendee.name}</td>
+                        <td className="p-4">{attendee.email}</td>
+                        <td className="p-4">{attendee.ticketType}</td>
+                        <td className="p-4">{attendee.purchaseDate}</td>
+                        <td className="p-4">
+                          <Button variant="ghost" size="sm">
+                            <Mail className="w-4 h-4" />
+                          </Button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             </Card>
-          ))}
-        </div>
-      </div>
+          )}
 
-      <div>
-        <h2 className="text-lg font-semibold mb-4">Top ticket sales</h2>
-        <Card>
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b">
-                  <th className="text-left p-4 font-medium">Event</th>
-                  <th className="text-left p-4 font-medium">Name of Ticket</th>
-                  <th className="text-left p-4 font-medium">Sold</th>
-                  <th className="text-left p-4 font-medium">Amount</th>
-                </tr>
-              </thead>
-              <tbody>
-                {ticketSales.map((sale, index) => (
-                  <tr key={index} className="border-b last:border-0">
-                    <td className="p-4">{sale.event}</td>
-                    <td className="p-4">{sale.type}</td>
-                    <td className="p-4">{sale.sold}</td>
-                    <td className="p-4">{sale.amount}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </Card>
-      </div>
+          {activeTab === "settings" && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <Card className="p-6">
+                <h3 className="text-lg font-semibold mb-6">Event Settings</h3>
+                <div className="space-y-4">
+                  <div>
+                  
+                    <Select defaultValue="public">
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select visibility" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="public">Public</SelectItem>
+                        <SelectItem value="private">Private</SelectItem>
+                        <SelectItem value="draft">Draft</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                 
+                  <div>
+                  
+                    <Input type="number" defaultValue="10" />
+                  </div>
+                </div>
+              </Card>
+
+              <Card className="p-6">
+                <h3 className="text-lg font-semibold mb-6">Notification Settings</h3>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <span>Email notifications</span>
+                    <Button variant="outline" size="sm">Configure</Button>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span>SMS notifications</span>
+                    <Button variant="outline" size="sm">Configure</Button>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span>Reminder schedule</span>
+                    <Button variant="outline" size="sm">Configure</Button>
+                  </div>
+                </div>
+              </Card>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

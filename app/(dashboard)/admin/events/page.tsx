@@ -12,7 +12,7 @@ const events = [
     title: "The Premier Conference",
     time: "10am till 3pm",
     location: "21 Bekwere Wosu St",
-    price: "$12.56",
+    price: "£12.56",
     image: "https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=300&h=200&auto=format&fit=crop"
   },
   {
@@ -20,7 +20,7 @@ const events = [
     title: "The Premier Conference",
     time: "10am till 3pm",
     location: "21 Bekwere Wosu St",
-    price: "$12.56",
+    price: "£12.56",
     image: "https://images.unsplash.com/photo-1552664730-d307ca884978?w=300&h=200&auto=format&fit=crop"
   },
   {
@@ -28,7 +28,7 @@ const events = [
     title: "The Premier Conference",
     time: "10am till 3pm",
     location: "21 Bekwere Wosu St",
-    price: "$12.56",
+    price: "£12.56",
     image: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=300&h=200&auto=format&fit=crop"
   },
   {
@@ -36,7 +36,7 @@ const events = [
     title: "The Premier Conference",
     time: "10am till 3pm",
     location: "21 Bekwere Wosu St",
-    price: "$12.56",
+    price: "£12.56",
     image: "https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=300&h=200&auto=format&fit=crop"
   }
 ];
