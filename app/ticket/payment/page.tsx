@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function PaymentPage() {
   return (
@@ -74,27 +75,29 @@ export default function PaymentPage() {
         <div className="space-y-4">
           <div className="flex justify-between">
             <span>1× STANDARD SINGLE (Admits 1)</span>
-            <span>$12.56</span>
+            <span>£12.56</span>
           </div>
           <div className="flex justify-between">
             <span>1× STANDARD SINGLE (Admits 1)</span>
-            <span>$12.56</span>
+            <span>£12.56</span>
           </div>
           <div className="border-t pt-4">
             <div className="flex justify-between mb-2">
               <span>Fees</span>
-              <span>$0</span>
+              <span>£0</span>
             </div>
             <div className="flex justify-between mb-4">
               <span>Subtotal</span>
-              <span>$12.56</span>
+              <span>£12.56</span>
             </div>
             <button className="text-blue-600 text-sm mb-4">Add discount code</button>
             <div className="flex justify-between mb-6">
               <span className="font-semibold">Total</span>
-              <span className="font-semibold">$13.56</span>
+              <span className="font-semibold">£13.56</span>
             </div>
-            <Button className="w-full">Get Tickets</Button>
+            <Link href="/ticket/get-ticket">
+              <Button className="w-full">Get Tickets</Button>
+            </Link>
           </div>
         </div>
       </Card>
