@@ -53,13 +53,13 @@ const events = [
     category: "Conference",
     ticketsSold: 350,
     totalTickets: 500,
-    revenue: "$43,750",
+    revenue: "£43,750",
     image: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&h=500&fit=crop",
     status: "Active",
     ticketTypes: [
-      { type: "Early Bird", sold: 100, total: 100, price: "$99" },
-      { type: "Regular", sold: 200, total: 300, price: "$129" },
-      { type: "VIP", sold: 50, total: 100, price: "$299" }
+      { type: "Early Bird", sold: 100, total: 100, price: "£99" },
+      { type: "Regular", sold: 200, total: 300, price: "£129" },
+      { type: "VIP", sold: 50, total: 100, price: "£299" }
     ],
     recentAttendees: [
       { name: "John Doe", email: "john@example.com", ticketType: "VIP", purchaseDate: "2024-03-01" },
@@ -69,7 +69,7 @@ const events = [
     analytics: {
       dailyViews: 1200,
       conversionRate: "3.5%",
-      averageOrderValue: "$175",
+      averageOrderValue: "£175",
       topReferrers: ["Google", "Facebook", "Direct"]
     }
   },
@@ -82,12 +82,12 @@ const events = [
     category: "Festival",
     ticketsSold: 1500,
     totalTickets: 2000,
-    revenue: "$75,000",
+    revenue: "£75,000",
     image: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800&h=500&fit=crop",
     status: "Upcoming",
     ticketTypes: [
-      { type: "General Admission", sold: 1000, total: 1500, price: "$49" },
-      { type: "VIP", sold: 500, total: 500, price: "$149" }
+      { type: "General Admission", sold: 1000, total: 1500, price: "£49" },
+      { type: "VIP", sold: 500, total: 500, price: "£149" }
     ]
   },
   {
@@ -99,12 +99,12 @@ const events = [
     category: "Corporate",
     ticketsSold: 280,
     totalTickets: 300,
-    revenue: "$84,000",
+    revenue: "£84,000",
     image: "https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=800&h=500&fit=crop",
     status: "Almost Sold Out",
     ticketTypes: [
-      { type: "Professional", sold: 200, total: 200, price: "$299" },
-      { type: "Executive", sold: 80, total: 100, price: "$499" }
+      { type: "Professional", sold: 200, total: 200, price: "£299" },
+      { type: "Executive", sold: 80, total: 100, price: "£499" }
     ]
   }
 ];
@@ -172,7 +172,7 @@ export default function AdminDashboard() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-500">Total Revenue</p>
-                  <p className="text-2xl font-bold">$202,750</p>
+                  <p className="text-2xl font-bold">£202,750</p>
                 </div>
                 <DollarSign className="w-8 h-8 text-green-500" />
               </div>
