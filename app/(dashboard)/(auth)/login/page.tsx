@@ -9,7 +9,6 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ArrowRight, KeyRound, Mail } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -98,7 +97,7 @@ export default function LoginPage() {
                   Forgot password?
                 </button>
               </div>
-              <Link href="/admin"> 
+
               <Button
                 type="submit"
                 className="w-full bg-[#27264E] hover:bg-[#1f1e3d] transition-colors"
@@ -114,7 +113,6 @@ export default function LoginPage() {
                   </span>
                 )}
               </Button>
-              </Link>
             </form>
           </motion.div>
         </div>
