@@ -15,10 +15,10 @@ export default function TicketLayout({
   };
 
   const navItems = [
-    { label: "About us", href: "/1#about" },
-    { label: "Events", href: "/1#events" },
-    { label: "Speakers", href: "/1#speakers" },
-    { label: "Tickets", href: "/ticket" }
+    { label: "About", href: "" },
+    { label: "Services  ", href: "" },
+    { label: "Events", href: "" },
+    // { label: "Tickets", href: "/ticket" }
   ];
 
   return (
