@@ -6,6 +6,6 @@ export class City extends BaseEntity {
   @Column()
   name!: string;
 
-  @OneToMany("Event", "city")
-  events!: any[];
+  // @OneToMany("Event", "city")
+  // events!: any[];
 }
