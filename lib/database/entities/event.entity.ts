@@ -1,6 +1,8 @@
 import { Entity, Column, OneToMany, ManyToOne, JoinColumn } from "typeorm";
 import { BaseEntity } from "./base.entity";
 import { Registration } from "./registration.entity";
+import { UserRegistration } from "./userRegistration.entity";
+import { EventStatus } from "@/lib/base";
 
 @Entity()
 export class Event extends BaseEntity {
@@ -20,6 +22,9 @@ export class Event extends BaseEntity {
   eventType!: string;
 
   @Column()
+  date!: Date;
+
+  @Column()
   startTime!: Date;
 
   @Column()
@@ -32,25 +37,37 @@ export class Event extends BaseEntity {
   address!: string;
 
   @Column()
+  postcode!: string;
+
+  @Column()
   eventImageUrl!: string;
 
   @Column({ default: false })
   isAllowWorkshop!: boolean;
 
+  @Column({
+      type: "enum",
+      enum: EventStatus,
+      array: true,
+      default: [EventStatus.ACTIVE],
+    })
+  isEventActive!: EventStatus;
+
   @Column({ default: false })
   isPaidFor!: boolean;
 
-  @ManyToOne("City", "events")
-  @JoinColumn()
-  city!: any;
+  @Column({ nullable: true })
+  city!: string;
 
-  @ManyToOne("State", "events")
-  @JoinColumn()
-  state!: any;
+  @Column({ nullable: true })
+  state!: string;
 
-  @ManyToOne("Country", "events")
+  @Column({ nullable: true })
+  country!: string;
+
+  @ManyToOne("UserRegistration", "event")
   @JoinColumn()
-  country!: any;
+  registeredusers!: any;
 
   @OneToMany("Ticket", "event")
   tickets!: any[];
@@ -59,5 +76,6 @@ export class Event extends BaseEntity {
   registrations!: Registration[];
 
   @OneToMany("Workshop", "event")
-  workshops!: any[];
+  workshops!: UserRegistration[];
+
 }
