@@ -7,24 +7,44 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
+import useAuthStore from "@/store/authstores";
 import { ArrowRight, KeyRound, Mail } from "lucide-react";
 import Image from "next/image";
+import ErrorDialog from "@/components/custom/errorDialog";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [isDialogOpen, setDialogOpen] = useState(false);
+  const login = useAuthStore((state: { login: any }) => state.login);
   const router = useRouter();
+
+  const handleOpenChange = (isOpen: boolean) => {
+    setDialogOpen(isOpen);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    
-    // Simulate login delay
-    setTimeout(() => {
+
+    try {
+      const result = await login({
+        email: email,
+        password: password,
+      });
+      console.log("Result: ", result.statusCode);
+      if (result.statusCode === 200) {
+        setIsLoading(false);
+        router.push("/admin");
+      } else {
+        setErrorMessage(result.error);
+        setDialogOpen(true);
+      }
+    } finally {
       setIsLoading(false);
-      router.push("/admin");
-    }, 1500);
+    }
   };
 
   return (
@@ -38,14 +58,13 @@ export default function LoginPage() {
             transition={{ duration: 0.5 }}
           >
             <div className="flex items-center gap-2 mb-8">
-            
-    <Image
-                  src="/images/PH.png"
-                  alt="PH Logo"
-                  width={30}
-                  height={30}
-                  className="w-20 h-8"
-                />
+              <Image
+                src="/images/PH.png"
+                alt="PH Logo"
+                width={30}
+                height={30}
+                className="w-20 h-8"
+              />
             </div>
 
             <h2 className="text-3xl font-bold mb-2">Welcome back</h2>
@@ -93,7 +112,10 @@ export default function LoginPage() {
                     Remember me
                   </Label>
                 </div>
-                <button type="button" className="text-sm text-blue-600 hover:text-blue-700">
+                <button
+                  type="button"
+                  className="text-sm text-blue-600 hover:text-blue-700"
+                >
                   Forgot password?
                 </button>
               </div>
@@ -114,6 +136,13 @@ export default function LoginPage() {
                 )}
               </Button>
             </form>
+            {/* Error dialog */}
+            <ErrorDialog
+              isOpen={isDialogOpen}
+              onOpenChange={handleOpenChange}
+              title="Oops! Error Occurred"
+              description={errorMessage} // Display dynamic error message
+            />
           </motion.div>
         </div>
       </div>
@@ -137,8 +166,8 @@ export default function LoginPage() {
                 Manage Your Events with Confidence
               </h2>
               <p className="text-lg text-gray-200">
-                Access your dashboard to create and manage events, track ticket sales,
-                and engage with your audience all in one place.
+                Access your dashboard to create and manage events, track ticket
+                sales, and engage with your audience all in one place.
               </p>
             </motion.div>
           </div>

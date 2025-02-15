@@ -43,11 +43,18 @@ export async function POST(request: Request) {
       overview, 
       category, 
       eventType, 
+      date, 
       startTime, 
       endTime, 
       venue, 
       address, 
-      eventImageUrl 
+      eventImageUrl, 
+      city,   
+      state,  
+      country,
+      postcode,
+      isAllowWorkshop,
+      isPaidFor
     } = await request.json();
 
     const db = await initializeDB();
@@ -70,12 +77,19 @@ export async function POST(request: Request) {
       overview,
       category,
       eventType,
+      date: new Date(date),
       startTime: new Date(startTime),
       endTime: new Date(endTime),
       venue,
       address,
       eventImageUrl,
-      workshops: [],       // Initialize as empty arrays
+      city,   
+      state,  
+      country, 
+      postcode,
+      isAllowWorkshop: isAllowWorkshop ?? false,
+      isPaidFor: isPaidFor ?? false,
+      workshops: [],       
       registrations: [],
       tickets: []
     });

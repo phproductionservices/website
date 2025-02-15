@@ -11,6 +11,7 @@ export const makeApiRequest = async (
   method = "post",
   payload = null
 ) => {
+  console.log("payload", payload);
   const token = useAuthStore.getState().authToken;
   console.log("API : ", `${API_BASE_URL}${endpoint}`);
   console.log("payload", payload);
@@ -18,7 +19,7 @@ export const makeApiRequest = async (
     const config = {
       method,
       headers: token ? { Authorization: `Bearer ${token}` } : undefined,
-      url: `${API_BASE_URL}${endpoint}`,
+      url: `http://localhost:3000/api/${endpoint}`,
       ...(payload && { data: payload }),
     };
     const response = await axios(config);
@@ -99,6 +100,7 @@ const useAuthStore = create(
       },
 
       resetPassword: async (payload) => {
+        
         if (payload.password !== payload.confirmPassword) {
           return {
             statusCode: 403,
@@ -110,12 +112,12 @@ const useAuthStore = create(
 
       login: async (user) => {
         console.log("Attempting login with user: ", user);
-        const result = await makeApiRequest("login", "post", user);
+        const result = await makeApiRequest("auth/login", "post", user);
       
         console.log("API result: ", result);
 
         if (result.statusCode === 200) {
-          const { token } = result.data.user;
+          const { token } = result.access_token;
           set({ authToken: token });
           customStorage.setItem("authToken", token);
         }

@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "seed": "ts-node --require tsconfig-paths/register ./seed.ts",
     "typeorm": "env-cmd ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js",
     "migration:generate": "npm run typeorm -- --dataSource=./lib/database/data-source.ts migration:generate",
     "migration:create": "npm run typeorm -- migration:create",
@@ -47,10 +48,12 @@
     "@types/react-dom": "18.2.7",
     "autoprefixer": "10.4.15",
     "axios": "^1.7.9",
+    "bcryptjs": "^2.4.3",
     "class-variance-authority": "^0.7.0",
     "cloudinary": "^2.5.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.0.0",
+    "crypto-js": "^4.2.0",
     "date-fns": "^3.6.0",
     "embla-carousel-react": "^8.3.0",
     "eslint": "8.49.0",
@@ -58,6 +61,7 @@
     "framer-motion": "^11.0.8",
     "input-otp": "^1.2.4",
     "jsbarcode": "^3.11.6",
+    "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.446.0",
     "mysql2": "^3.9.2",
     "next": "^15.1.6",
@@ -82,6 +86,9 @@
     "zustand": "^5.0.3"
   },
   "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/crypto-js": "^4.2.2",
+    "@types/jsonwebtoken": "^9.0.8",
     "@types/node": "^22.13.1",
     "env-cmd": "^10.1.0",
     "ts-node": "^10.9.2"
