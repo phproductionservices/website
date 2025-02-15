@@ -9,6 +9,7 @@ import { State } from "./entities/state.entity";
 import { Ticket } from "./entities/ticket.entity";
 import { Workshop } from "./entities/workshop.entity";
 import { Event } from "./entities/event.entity";
+import { UserRegistration } from "./entities/userRegistration.entity";
 
 export const AppDataSource = new DataSource({
   type: "mysql",
@@ -28,7 +29,8 @@ export const AppDataSource = new DataSource({
     State,
     City,
     Country,
-    Event
+    Event,
+    UserRegistration
   ],
   migrations: [__dirname + "/migrations/*.ts"],
   subscribers: [],
