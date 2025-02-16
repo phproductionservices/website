@@ -20,14 +20,14 @@ export const createSlug = (text: string) => {
 };
 
 export function handleAxiosError(error: {
-  response: { status: any; error: any  };
+  response: { status: any; data: { message: any } };
   request: any;
 }) {
   if (error.response) {
     // The server responded with a status code that falls out of the range of 2xx
     return {
       statusCode: error.response.status,
-      message: error.response.error ?? 'An error occurred during the request',
+      message: error.response.data.message ?? 'An error occurred during the request',
     };
   } else if (error.request) {
     // The request was made but no response was received

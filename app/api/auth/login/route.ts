@@ -19,7 +19,7 @@ export async function POST(request: Request) {
 
     if (!user) {
       return NextResponse.json(
-        { error: "User not found. Please sign up." },
+        { message: "User not found. Please sign up.", status: 404, error: true },
         { status: 404 }
       );
     }
@@ -28,7 +28,7 @@ export async function POST(request: Request) {
     const isValidPassword = await user.validatePassword(password);
     if (!isValidPassword) {
       return NextResponse.json(
-        { error: "Incorrect password. Please try again." },
+        { message: "Incorrect password. Please try again.", status: 401, error: true },
         { status: 401 }
       );
     }
@@ -52,12 +52,14 @@ export async function POST(request: Request) {
       data: {
         user: userWithoutPassword,
         access_token: token
-      }
+      },
+      status: 200,
+      error: false
     });
   } catch (error) {
     console.error("Error during login:", error);
     return NextResponse.json(
-      { error: "An unexpected error occurred. Please try again later." },
+      { message: "An unexpected error occurred. Please try again later.", status: 500, error: true },
       { status: 500 }
     );
   }

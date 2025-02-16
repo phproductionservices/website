@@ -5,7 +5,6 @@ import axios from "axios";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
-
 export const makeApiRequest = async (
   endpoint,
   method = "post",
@@ -19,25 +18,24 @@ export const makeApiRequest = async (
     const config = {
       method,
       headers: token ? { Authorization: `Bearer ${token}` } : undefined,
-      url: `http://localhost:3000/api/${endpoint}`,
+      url: `/api/auth/login`,
       ...(payload && { data: payload }),
     };
     const response = await axios(config);
+    console.log("message : ", response.data.message);
     const { data } = response;
     console.log("Data : ", data);
     return {
       statusCode: response.status,
-      message: data.message,
-      data: data.data,
+      message: response.data.message,
+      data: response.data,
       error: null,
     };
   } catch (error) {
     console.log("Error : ", error);
-
     return handleAxiosError(error);
   }
 };
-
 
 export const makeApiRequest2 = async (
   endpoint,
@@ -67,9 +65,8 @@ const useAuthStore = create(
       rehydrationComplete: false,
       setRehydrationComplete: (status) => set({ rehydrationComplete: status }),
 
-      // Function to sign up a user and save their record
       signUp: async (user) => {
-        const result = makeApiRequest("register", "post", user);
+        const result = makeApiRequest("auth/register", "post", user);
 
         console.log("API result: ", result);
 
@@ -89,7 +86,7 @@ const useAuthStore = create(
         makeApiRequest("auth/otp/resend", "post", payload),
 
       forgotPassword: async (payload) => {
-        const result = makeApiRequest("forgot-password", "post", payload);
+        const result = makeApiRequest("auth/forgot-password", "post", payload);
 
         if (result.statusCode === 200) {
           const { token } = result.data.user;
@@ -100,7 +97,6 @@ const useAuthStore = create(
       },
 
       resetPassword: async (payload) => {
-        
         if (payload.password !== payload.confirmPassword) {
           return {
             statusCode: 403,
@@ -117,14 +113,14 @@ const useAuthStore = create(
         console.log("API result: ", result);
 
         if (result.statusCode === 200) {
-          const { token } = result.access_token;
-          set({ authToken: token });
-          customStorage.setItem("authToken", token);
+          const { access_token } = result.data;
+          set({ authToken: access_token });
+          customStorage.setItem("authToken", access_token);
         }
       
         console.log("Final result: ", result);
         return result;
-      },      
+      },     
 
       fetchUserProfile: async () => {
         const result = await makeApiRequest("users/me", "get");
@@ -148,8 +144,6 @@ const useAuthStore = create(
 
       clearAuth: async () => {
         set({ authToken: null, userProfile: null });
-        // const settingStore = await useSettingStore.getState();
-        // settingStore.sendPendingInteractions();
         customStorage.clear();
       },
 
@@ -160,7 +154,6 @@ const useAuthStore = create(
               ? newProfile(state.userProfile)
               : newProfile;
 
-          // Save the updated profile to local storage
           customStorage.setItem("userProfile", updatedProfile);
 
           return { userProfile: updatedProfile };
@@ -180,7 +173,6 @@ const useAuthStore = create(
       name: "auth-storage",
       storage: customStorage,
       onRehydrateStorage: () => (state) => {
-        // Called after rehydration is complete
         state?.setRehydrationComplete(true);
       },
     }

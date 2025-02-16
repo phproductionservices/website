@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { initializeDB } from "@/lib/database/db";
 import { Event } from "@/lib/database/entities/event.entity";
 import { createSlug } from "@/lib/utils";
+import { data } from "autoprefixer";
+import { error } from "console";
 
 // Configure route for static export
 export const dynamic = "force-dynamic";
@@ -26,11 +28,11 @@ export async function GET() {
       tickets: event.tickets ?? [],
     }));
 
-    return NextResponse.json(eventsWithRelations);
+    return NextResponse.json({ message: 'Events fetch successful!', data: eventsWithRelations, status: 200, error: false });
   } catch (error) {
     console.error("Error fetching events:", error);
     return NextResponse.json(
-      { error: "Failed to fetch events" },
+      { message: "Failed to fetch events", status: 500, error: true },
       { status: 500 }
     );
   }
@@ -66,7 +68,7 @@ export async function POST(request: Request) {
 
     if (existingEvent) {
       return NextResponse.json(
-        { error: "Event already exists with similar name" },
+        { message: "Event already exists with similar name", status: 400, error: true },
         { status: 400 }
       );
     }
@@ -96,11 +98,11 @@ export async function POST(request: Request) {
 
     await eventRepo.save(event);
 
-    return NextResponse.json(event, { status: 201 });
+    return NextResponse.json({ message: 'Events added successful!', data: event, status: 201, error: false });
   } catch (error) {
     console.error("Error creating event:", error);
     return NextResponse.json(
-      { error: "Failed to create event" },
+      { message: "Failed to create event", error: false, status: 500 },
       { status: 500 }
     );
   }
