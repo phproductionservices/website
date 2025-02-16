@@ -37,7 +37,7 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts"
-  ],
+, "store/authstores.js"  ],
   "exclude": [
     "node_modules"
   ]

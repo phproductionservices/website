@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import useAuthStore from "@/store/authstores";
+import useAuthStore from "../../../../store/authstores";
 import { ArrowRight, KeyRound, Mail } from "lucide-react";
 import Image from "next/image";
 import ErrorDialog from "@/components/custom/errorDialog";
@@ -30,6 +30,7 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
+      
       const result = await login({
         email: email,
         password: password,
@@ -39,7 +40,7 @@ export default function LoginPage() {
         setIsLoading(false);
         router.push("/admin");
       } else {
-        setErrorMessage(result.error);
+        setErrorMessage(result.message);
         setDialogOpen(true);
       }
     } finally {
