@@ -15,7 +15,6 @@ export async function GET(
 
     const event = await eventRepo.findOne({
       where: { uuid: params.uuid },
-      relations: ["workshops", "registrations", "tickets", "city", "state", "country"],
     });
 
     if (!event) {
@@ -25,7 +24,7 @@ export async function GET(
       );
     }
 
-    return NextResponse.json(event);
+    return NextResponse.json({status: 200, data: event, message: "Event found", error: null});
   } catch (error) {
     console.error("Error fetching event:", error);
     return NextResponse.json(

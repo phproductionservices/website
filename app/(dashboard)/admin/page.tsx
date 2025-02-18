@@ -1,17 +1,32 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { 
-  Clock, 
-  MapPin, 
-  Search, 
-  Filter, 
-  Users, 
-  Ticket, 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import useAuthStore from "@/store/authstores";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Clock,
+  MapPin,
+  Search,
+  Filter,
+  Users,
+  Ticket,
   ArrowRight,
   Download,
   Mail,
@@ -19,7 +34,9 @@ import {
   Calendar,
   DollarSign,
   TrendingUp,
-  AlertCircle
+  AlertCircle,
+  MoreHorizontal,
+  Eye,
 } from "lucide-react";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
@@ -30,8 +47,11 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  ResponsiveContainer
-} from 'recharts';
+  ResponsiveContainer,
+} from "recharts";
+import useEventStore from "@/store/eventstore";
+import router from "next/router";
+import { formatDate, formatTime } from "@/lib/utils";
 
 const salesData = [
   { name: "Mon", sales: 2400 },
@@ -40,8 +60,34 @@ const salesData = [
   { name: "Thu", sales: 3908 },
   { name: "Fri", sales: 4800 },
   { name: "Sat", sales: 3800 },
-  { name: "Sun", sales: 4300 }
+  { name: "Sun", sales: 4300 },
 ];
+
+type Event = {
+  id: number;
+  uuid: string;
+  created_at: string;
+  updated_at: string;
+  deleted_at: string | null;
+  title: string;
+  slug: string;
+  category: string;
+  overview: string;
+  eventType: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+  venue: string;
+  address: string;
+  postcode: string;
+  eventImageUrl: string;
+  isAllowWorkshop: boolean;
+  status: string;
+  isPaidFor: boolean;
+  city: string;
+  state: string;
+  country: string;
+};
 
 const events = [
   {
@@ -54,24 +100,41 @@ const events = [
     ticketsSold: 350,
     totalTickets: 500,
     revenue: "£43,750",
-    image: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&h=500&fit=crop",
     status: "Active",
+    image:
+      "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&h=500&fit=crop",
+    attendees: "500+",
     ticketTypes: [
       { type: "Early Bird", sold: 100, total: 100, price: "£99" },
       { type: "Regular", sold: 200, total: 300, price: "£129" },
-      { type: "VIP", sold: 50, total: 100, price: "£299" }
+      { type: "VIP", sold: 50, total: 100, price: "£299" },
     ],
     recentAttendees: [
-      { name: "John Doe", email: "john@example.com", ticketType: "VIP", purchaseDate: "2024-03-01" },
-      { name: "Jane Smith", email: "jane@example.com", ticketType: "Regular", purchaseDate: "2024-03-02" },
-      { name: "Mike Johnson", email: "mike@example.com", ticketType: "Early Bird", purchaseDate: "2024-03-03" }
+      {
+        name: "John Doe",
+        email: "john@example.com",
+        ticketType: "VIP",
+        purchaseDate: "2024-03-01",
+      },
+      {
+        name: "Jane Smith",
+        email: "jane@example.com",
+        ticketType: "Regular",
+        purchaseDate: "2024-03-02",
+      },
+      {
+        name: "Mike Johnson",
+        email: "mike@example.com",
+        ticketType: "Early Bird",
+        purchaseDate: "2024-03-03",
+      },
     ],
     analytics: {
       dailyViews: 1200,
       conversionRate: "3.5%",
       averageOrderValue: "£175",
-      topReferrers: ["Google", "Facebook", "Direct"]
-    }
+      topReferrers: ["Google", "Facebook", "Direct"],
+    },
   },
   {
     id: 2,
@@ -83,12 +146,15 @@ const events = [
     ticketsSold: 1500,
     totalTickets: 2000,
     revenue: "£75,000",
-    image: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800&h=500&fit=crop",
     status: "Upcoming",
+    image:
+      "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800&h=500&fit=crop",
+    attendees: "2000+",
     ticketTypes: [
       { type: "General Admission", sold: 1000, total: 1500, price: "£49" },
-      { type: "VIP", sold: 500, total: 500, price: "£149" }
-    ]
+      { type: "VIP", sold: 500, total: 500, price: "£149" },
+    ],
+    recentAttendees: [],
   },
   {
     id: 3,
@@ -100,39 +166,73 @@ const events = [
     ticketsSold: 280,
     totalTickets: 300,
     revenue: "£84,000",
-    image: "https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=800&h=500&fit=crop",
     status: "Almost Sold Out",
+    image:
+      "https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=800&h=500&fit=crop",
+    attendees: "300",
     ticketTypes: [
       { type: "Professional", sold: 200, total: 200, price: "£299" },
-      { type: "Executive", sold: 80, total: 100, price: "£499" }
-    ]
-  }
+      { type: "Executive", sold: 80, total: 100, price: "£499" },
+    ],
+    recentAttendees: [],
+  },
 ];
 
 export default function AdminDashboard() {
+  const { allevents, fetchEventAll } = useEventStore();
   const [selectedEvent, setSelectedEvent] = useState<any>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("All");
   const [activeTab, setActiveTab] = useState("overview");
   const [showEmailModal, setShowEmailModal] = useState(false);
 
-  const filteredEvents = events.filter(event => {
-    const matchesSearch = event.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         event.location.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory = categoryFilter === "All" || event.category === categoryFilter;
+  const [isFetchedEvents, setFetchedEvents] = useState(false);
+  const [allfetchedevents, setEvents] = useState<Event[]>([]);
+
+  // Fetch API data
+  useEffect(() => {
+    const fetchData = async () => {
+      setFetchedEvents(false);
+      try {
+        const response = await fetchEventAll();
+        if (
+          response.statusCode === 404 &&
+          response.message === "Token has expired"
+        ) {
+          router.push("/");
+        } else if (response.statusCode === 200) {
+          setEvents(response.data);
+          console.log("Number of events: ", response.data);
+        }
+      } catch (error) {
+        console.error("Error fetching events: ", error);
+      } finally {
+        setFetchedEvents(true);
+      }
+    };
+
+    fetchData();
+  }, [fetchEventAll, router]);
+
+  const filteredEvents = allfetchedevents.filter((event) => {
+    const matchesSearch =
+      event.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      event.city.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesCategory =
+      categoryFilter === "All" || event.category === categoryFilter;
     return matchesSearch && matchesCategory;
   });
 
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
-      case 'active':
-        return 'bg-green-100 text-green-800';
-      case 'upcoming':
-        return 'bg-blue-100 text-blue-800';
-      case 'almost sold out':
-        return 'bg-yellow-100 text-yellow-800';
+      case "active":
+        return "bg-green-100 text-green-800";
+      case "upcoming":
+        return "bg-blue-100 text-blue-800";
+      case "almost sold out":
+        return "bg-yellow-100 text-yellow-800";
       default:
-        return 'bg-gray-100 text-gray-800';
+        return "bg-gray-100 text-gray-800";
     }
   };
 
@@ -146,7 +246,8 @@ export default function AdminDashboard() {
 
   const handleDownloadAttendees = () => {
     // Simulate CSV download
-    const csvContent = "data:text/csv;charset=utf-8,Name,Email,Ticket Type,Purchase Date\n";
+    const csvContent =
+      "data:text/csv;charset=utf-8,Name,Email,Ticket Type,Purchase Date\n";
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
     link.setAttribute("href", encodedUri);
@@ -176,7 +277,9 @@ export default function AdminDashboard() {
                 </div>
                 <DollarSign className="w-8 h-8 text-green-500" />
               </div>
-              <div className="mt-2 text-sm text-green-500">+12.5% from last month</div>
+              <div className="mt-2 text-sm text-green-500">
+                +12.5% from last month
+              </div>
             </Card>
             <Card className="p-6">
               <div className="flex items-center justify-between">
@@ -186,7 +289,9 @@ export default function AdminDashboard() {
                 </div>
                 <Calendar className="w-8 h-8 text-blue-500" />
               </div>
-              <div className="mt-2 text-sm text-blue-500">2 starting this week</div>
+              <div className="mt-2 text-sm text-blue-500">
+                2 starting this week
+              </div>
             </Card>
             <Card className="p-6">
               <div className="flex items-center justify-between">
@@ -196,7 +301,9 @@ export default function AdminDashboard() {
                 </div>
                 <Ticket className="w-8 h-8 text-purple-500" />
               </div>
-              <div className="mt-2 text-sm text-purple-500">+5.2% from last week</div>
+              <div className="mt-2 text-sm text-purple-500">
+                +5.2% from last week
+              </div>
             </Card>
             <Card className="p-6">
               <div className="flex items-center justify-between">
@@ -206,11 +313,13 @@ export default function AdminDashboard() {
                 </div>
                 <TrendingUp className="w-8 h-8 text-orange-500" />
               </div>
-              <div className="mt-2 text-sm text-orange-500">+0.8% from last month</div>
+              <div className="mt-2 text-sm text-orange-500">
+                +0.8% from last month
+              </div>
             </Card>
           </div>
 
-          <div className="flex gap-4">
+          <div className="flex gap-4 mb-6">
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
               <Input
@@ -233,54 +342,74 @@ export default function AdminDashboard() {
             </Select>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {filteredEvents.map((event) => (
-              <Card 
-                key={event.id} 
-                className="cursor-pointer hover:shadow-lg transition-shadow"
-                onClick={() => setSelectedEvent(event)}
-              >
-                <div className="relative h-48">
-                  <img
-                    src={event.image}
-                    alt={event.title}
-                    className="w-full h-full object-cover rounded-t-lg"
-                  />
-                  <Badge className={`absolute top-4 right-4 ${getStatusColor(event.status)}`}>
-                    {event.status}
-                  </Badge>
-                </div>
-                <div className="p-6">
-                  <div className="flex justify-between items-start mb-4">
-                    <div>
-                      <h3 className="font-semibold text-lg mb-2">{event.title}</h3>
+          <Card className="p-6">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Event</TableHead>
+                  <TableHead>Date & Time</TableHead>
+                  <TableHead>Location</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredEvents.map((event) => (
+                  <TableRow
+                    key={event.id}
+                    className="cursor-pointer hover:bg-gray-50"
+                    onClick={() => setSelectedEvent(event)}
+                  >
+                    <TableCell>
+                      <div className="flex items-center gap-3">
+                        <img
+                          src={event.eventImageUrl}
+                          alt={event.title}
+                          className="w-12 h-12 rounded-lg object-cover"
+                        />
+                        <div>
+                          <div className="font-medium">{event.title}</div>
+                          <div className="text-sm text-gray-500">
+                            {event.category}
+                          </div>
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="text-sm">
+                        <div>{formatDate(event.date)}</div>
+                        <div className="text-gray-500">
+                          {formatTime(event.startTime)} -{" "}
+                          {formatTime(event.endTime)}
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell>
                       <div className="flex items-center text-sm text-gray-500">
-                        <Clock className="w-4 h-4 mr-1" />
-                        <span>{event.date}</span>
-                      </div>
-                      <div className="flex items-center text-sm text-gray-500 mt-1">
                         <MapPin className="w-4 h-4 mr-1" />
-                        <span>{event.location}</span>
+                        {event.venue},{event.address}
                       </div>
-                    </div>
-                    <span className="text-blue-600 font-semibold">{event.revenue}</span>
-                  </div>
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Tickets Sold</span>
-                      <span>{event.ticketsSold}/{event.totalTickets}</span>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div
-                        className="bg-blue-600 rounded-full h-2"
-                        style={{ width: `${calculateProgress(event.ticketsSold, event.totalTickets)}%` }}
-                      />
-                    </div>
-                  </div>
-                </div>
-              </Card>
-            ))}
-          </div>
+                    </TableCell>
+                    <TableCell>
+                      <Badge className={getStatusColor(event.status)}>
+                        {event.status}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <Button variant="ghost" size="icon">
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                        <Button variant="ghost" size="icon">
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </Card>
         </>
       ) : (
         <div className="space-y-8">
@@ -296,7 +425,7 @@ export default function AdminDashboard() {
           </div>
 
           <div className="flex gap-4 border-b">
-            {["overview", "attendees",].map((tab) => (
+            {["overview", "attendees"].map((tab) => (
               <button
                 key={tab}
                 className={`px-4 py-2 font-medium ${
@@ -320,7 +449,9 @@ export default function AdminDashboard() {
                     alt={selectedEvent.title}
                     className="w-full h-64 object-cover rounded-lg mb-6"
                   />
-                  <h2 className="text-2xl font-bold mb-4">{selectedEvent.title}</h2>
+                  <h2 className="text-2xl font-bold mb-4">
+                    {selectedEvent.title}
+                  </h2>
                   <div className="grid grid-cols-2 gap-4 mb-6">
                     <div className="flex items-center text-gray-600">
                       <Clock className="w-5 h-5 mr-2" />
@@ -340,20 +471,33 @@ export default function AdminDashboard() {
                   </div>
 
                   <div className="mt-6">
-                    <h3 className="text-lg font-semibold mb-4">Recent Activity</h3>
+                    <h3 className="text-lg font-semibold mb-4">
+                      Recent Activity
+                    </h3>
                     <div className="space-y-4">
-                      {selectedEvent.recentAttendees.map((attendee: any, index: number) => (
-                        <div key={index} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                          <div>
-                            <p className="font-medium">{attendee.name}</p>
-                            <p className="text-sm text-gray-500">{attendee.email}</p>
+                      {selectedEvent.recentAttendees.map(
+                        (attendee: any, index: number) => (
+                          <div
+                            key={index}
+                            className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
+                          >
+                            <div>
+                              <p className="font-medium">{attendee.name}</p>
+                              <p className="text-sm text-gray-500">
+                                {attendee.email}
+                              </p>
+                            </div>
+                            <div className="text-right">
+                              <p className="text-sm font-medium">
+                                {attendee.ticketType}
+                              </p>
+                              <p className="text-sm text-gray-500">
+                                {attendee.purchaseDate}
+                              </p>
+                            </div>
                           </div>
-                          <div className="text-right">
-                            <p className="text-sm font-medium">{attendee.ticketType}</p>
-                            <p className="text-sm text-gray-500">{attendee.purchaseDate}</p>
-                          </div>
-                        </div>
-                      ))}
+                        )
+                      )}
                     </div>
                   </div>
                 </Card>
@@ -367,7 +511,11 @@ export default function AdminDashboard() {
                         <XAxis dataKey="name" />
                         <YAxis />
                         <Tooltip />
-                        <Line type="monotone" dataKey="sales" stroke="#2563eb" />
+                        <Line
+                          type="monotone"
+                          dataKey="sales"
+                          stroke="#2563eb"
+                        />
                       </LineChart>
                     </ResponsiveContainer>
                   </div>
@@ -383,7 +531,9 @@ export default function AdminDashboard() {
                         <Ticket className="w-5 h-5 text-blue-600 mr-3" />
                         <div>
                           <p className="text-sm text-gray-500">Total Sales</p>
-                          <p className="font-semibold">{selectedEvent.revenue}</p>
+                          <p className="font-semibold">
+                            {selectedEvent.revenue}
+                          </p>
                         </div>
                       </div>
                     </div>
@@ -393,7 +543,8 @@ export default function AdminDashboard() {
                         <div>
                           <p className="text-sm text-gray-500">Attendance</p>
                           <p className="font-semibold">
-                            {selectedEvent.ticketsSold}/{selectedEvent.totalTickets}
+                            {selectedEvent.ticketsSold}/
+                            {selectedEvent.totalTickets}
                           </p>
                         </div>
                       </div>
@@ -402,8 +553,12 @@ export default function AdminDashboard() {
                       <div className="flex items-center">
                         <BarChart2 className="w-5 h-5 text-blue-600 mr-3" />
                         <div>
-                          <p className="text-sm text-gray-500">Conversion Rate</p>
-                          <p className="font-semibold">{selectedEvent.analytics.conversionRate}</p>
+                          <p className="text-sm text-gray-500">
+                            Conversion Rate
+                          </p>
+                          <p className="font-semibold">
+                            {selectedEvent.analytics?.conversionRate}
+                          </p>
                         </div>
                       </div>
                     </div>
@@ -413,16 +568,16 @@ export default function AdminDashboard() {
                 <Card className="p-6">
                   <h3 className="text-lg font-semibold mb-4">Quick Actions</h3>
                   <div className="space-y-3">
-                    <Button 
-                      className="w-full" 
+                    <Button
+                      className="w-full"
                       variant="outline"
                       onClick={handleDownloadAttendees}
                     >
                       <Download className="w-4 h-4 mr-2" />
                       Download Attendee List
                     </Button>
-                    <Button 
-                      className="w-full" 
+                    <Button
+                      className="w-full"
                       variant="outline"
                       onClick={handleSendEmail}
                     >
@@ -439,68 +594,53 @@ export default function AdminDashboard() {
                 <Card className="p-6">
                   <h3 className="text-lg font-semibold mb-4">Ticket Types</h3>
                   <div className="space-y-4">
-                    {selectedEvent.ticketTypes.map((ticket: any, index: number) => (
-                      <div key={index} className="p-4 border rounded-lg">
-                        <div className="flex justify-between items-start mb-2">
-                          <div>
-                            <h4 className="font-medium">{ticket.type}</h4>
-                            <p className="text-sm text-gray-500">Price: {ticket.price}</p>
+                    {selectedEvent.ticketTypes.map(
+                      (ticket: any, index: number) => (
+                        <div key={index} className="p-4 border rounded-lg">
+                          <div className="flex justify-between items-start mb-2">
+                            <div>
+                              <h4 className="font-medium">{ticket.type}</h4>
+                              <p className="text-sm text-gray-500">
+                                Price: {ticket.price}
+                              </p>
+                            </div>
+                            <Badge
+                              className={getStatusColor(
+                                ticket.sold === ticket.total
+                                  ? "Sold Out"
+                                  : "Available"
+                              )}
+                            >
+                              {ticket.sold === ticket.total
+                                ? "Sold Out"
+                                : "Available"}
+                            </Badge>
                           </div>
-                          <Badge className={getStatusColor(
-                            ticket.sold === ticket.total ? 'Sold Out' : 'Available'
-                          )}>
-                            {ticket.sold === ticket.total ? 'Sold Out' : 'Available'}
-                          </Badge>
+                          <div className="space-y-2">
+                            <div className="flex justify-between text-sm">
+                              <span>Sold</span>
+                              <span>
+                                {ticket.sold}/{ticket.total}
+                              </span>
+                            </div>
+                            <div className="w-full bg-gray-200 rounded-full h-2">
+                              <div
+                                className="bg-blue-600 rounded-full h-2"
+                                style={{
+                                  width: `${calculateProgress(
+                                    ticket.sold,
+                                    ticket.total
+                                  )}%`,
+                                }}
+                              />
+                            </div>
+                          </div>
                         </div>
-                        <div className="space-y-2">
-                          <div className="flex justify-between text-sm">
-                            <span>Sold</span>
-                            <span>{ticket.sold}/{ticket.total}</span>
-                          </div>
-                          <div className="w-full bg-gray-200 rounded-full h-2">
-                            <div
-                              className="bg-blue-600 rounded-full h-2"
-                              style={{ width: `${calculateProgress(ticket.sold, ticket.total)}%` }}
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    ))}
+                      )
+                    )}
                   </div>
                 </Card>
               </div>
-            </div>
-          )}
-
-          {activeTab === "analytics" && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <Card className="p-6">
-                <h3 className="text-lg font-semibold mb-6">Traffic Sources</h3>
-                <div className="space-y-4">
-                  {selectedEvent.analytics.topReferrers.map((referrer: string, index: number) => (
-                    <div key={index} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                      <span>{referrer}</span>
-                      <span className="text-blue-600 font-medium">
-                        {Math.floor(Math.random() * 1000)} visits
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </Card>
-              
-              <Card className="p-6">
-                <h3 className="text-lg font-semibold mb-6">Key Metrics</h3>
-                <div className="space-y-4">
-                  <div className="p-4 bg-gray-50 rounded-lg">
-                    <p className="text-sm text-gray-500">Daily Page Views</p>
-                    <p className="text-2xl font-bold">{selectedEvent.analytics.dailyViews}</p>
-                  </div>
-                  <div className="p-4 bg-gray-50 rounded-lg">
-                    <p className="text-sm text-gray-500">Average Order Value</p>
-                    <p className="text-2xl font-bold">{selectedEvent.analytics.averageOrderValue}</p>
-                  </div>
-                </div>
-              </Card>
             </div>
           )}
 
@@ -525,69 +665,25 @@ export default function AdminDashboard() {
                     </tr>
                   </thead>
                   <tbody>
-                    {selectedEvent.recentAttendees.map((attendee: any, index: number) => (
-                      <tr key={index} className="border-b">
-                        <td className="p-4">{attendee.name}</td>
-                        <td className="p-4">{attendee.email}</td>
-                        <td className="p-4">{attendee.ticketType}</td>
-                        <td className="p-4">{attendee.purchaseDate}</td>
-                        <td className="p-4">
-                          <Button variant="ghost" size="sm">
-                            <Mail className="w-4 h-4" />
-                          </Button>
-                        </td>
-                      </tr>
-                    ))}
+                    {selectedEvent.recentAttendees.map(
+                      (attendee: any, index: number) => (
+                        <tr key={index} className="border-b">
+                          <td className="p-4">{attendee.name}</td>
+                          <td className="p-4">{attendee.email}</td>
+                          <td className="p-4">{attendee.ticketType}</td>
+                          <td className="p-4">{attendee.purchaseDate}</td>
+                          <td className="p-4">
+                            <Button variant="ghost" size="sm">
+                              <Mail className="w-4 h-4" />
+                            </Button>
+                          </td>
+                        </tr>
+                      )
+                    )}
                   </tbody>
                 </table>
               </div>
             </Card>
-          )}
-
-          {activeTab === "settings" && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <Card className="p-6">
-                <h3 className="text-lg font-semibold mb-6">Event Settings</h3>
-                <div className="space-y-4">
-                  <div>
-                  
-                    <Select defaultValue="public">
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select visibility" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="public">Public</SelectItem>
-                        <SelectItem value="private">Private</SelectItem>
-                        <SelectItem value="draft">Draft</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                 
-                  <div>
-                  
-                    <Input type="number" defaultValue="10" />
-                  </div>
-                </div>
-              </Card>
-
-              <Card className="p-6">
-                <h3 className="text-lg font-semibold mb-6">Notification Settings</h3>
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <span>Email notifications</span>
-                    <Button variant="outline" size="sm">Configure</Button>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span>SMS notifications</span>
-                    <Button variant="outline" size="sm">Configure</Button>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span>Reminder schedule</span>
-                    <Button variant="outline" size="sm">Configure</Button>
-                  </div>
-                </div>
-              </Card>
-            </div>
           )}
         </div>
       )}
