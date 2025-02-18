@@ -137,7 +137,7 @@ export default function EventsPage() {
                       <span>{event.address}</span>
                     </div>
                   </div>
-                  <span className="text-blue-600 font-semibold">{event.eventTypeg}</span>
+                  <span className="text-blue-600 font-semibold">{event.eventType}</span>
                 </div>
                 <div className="flex gap-2 mt-4">
                   <Button variant="outline">Edit Event</Button>

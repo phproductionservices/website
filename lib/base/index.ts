@@ -15,3 +15,8 @@ export enum EventStatus {
   UPCOMING = "Upcoming",
   SOLDOUT = "Sold out",
 }
+
+export enum TicketType {
+  Event = "Event",
+  Workshop = "Workshop",
+}

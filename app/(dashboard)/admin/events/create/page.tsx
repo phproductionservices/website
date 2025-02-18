@@ -7,123 +7,268 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Ticket, Eye, Calendar, Clock, User, Image as ImageIcon } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Image as ImageIcon,
+  ArrowRight,
+} from "lucide-react";
+import useEventStore from "@/store/eventstore";
+import {
+  CldUploadWidget,
+  CloudinaryUploadWidgetResults,
+} from "next-cloudinary";
+import { useToast } from "@/hooks/use-toast";
 
+// Define form data type
+interface FormData {
+  title: string;
+  category: string;
+  overview: string;
+  eventType: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+  venue: string;
+  address: string;
+  postcode: string;
+  eventImageUrl: string;
+  isAllowWorkshop: boolean;
+  isPaidFor: boolean;
+  city: string;
+  state: string;
+  country: string;
+  [key: string]: string | boolean; // Index signature
+}
 
-const steps = [
-  { 
-    id: "details",
-    name: "Event details",
-    description: "Enter details of your event",
-    icon: User
-  },
-  {
-    id: "schedule",
-    name: "Schedule",
-    description: "Create daily schedule for your event",
-    icon: Calendar
-  },
-  {
-    id: "ticket",
-    name: "Ticket",
-    description: "Start collaborating with your team",
-    icon: Ticket
-  },
-  {
-    id: "preview",
-    name: "Preview",
-    description: "Review and edit your event",
-    icon: Eye
-  }
-]
 export default function CreateEventPage() {
   const [currentStep, setCurrentStep] = useState("details");
+  const [isLoading, setIsLoading] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const router = useRouter();
+  const { toast } = useToast()
 
-  const handleNext = () => {
-    const currentIndex = steps.findIndex(step => step.id === currentStep);
-    if (currentIndex < steps.length - 1) {
-      setCurrentStep(steps[currentIndex + 1].id);
-    } else {
-      router.push("/admin/events");
+  // Form state with type
+  const [formData, setFormData] = useState<FormData>({
+    title: "",
+    category: "",
+    overview: "",
+    eventType: "",
+    date: "",
+    startTime: "",
+    endTime: "",
+    venue: "",
+    address: "",
+    postcode: "",
+    eventImageUrl: "",
+    isAllowWorkshop: false,
+    isPaidFor: false,
+    city: "",
+    state: "",
+    country: "",
+  });
+
+  const validateForm = () => {
+    const newErrors: { [key: string]: string } = {};
+
+    // Required fields validation
+    const requiredFields = [
+      "title",
+      "category",
+      "overview",
+      "eventType",
+      "date",
+      "startTime",
+      "endTime",
+      "venue",
+      "address",
+      "postcode",
+      "city",
+      "state",
+      "country",
+    ] as const;
+
+    requiredFields.forEach((field) => {
+      const value = formData[field];
+      if (typeof value === "string" && !value.trim()) {
+        newErrors[field] = `${
+          field.charAt(0).toUpperCase() + field.slice(1)
+        } is required`;
+      }
+    });
+
+    // Image validation
+    if (!formData.eventImageUrl) {
+      newErrors.eventImageUrl = "Event image is required";
     }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
-  const handlePrev = () => {
-    const currentIndex = steps.findIndex(step => step.id === currentStep);
-    if (currentIndex > 0) {
-      setCurrentStep(steps[currentIndex - 1].id);
+  const handleNext = async () => {
+    
+    if (!validateForm()) {
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      const response = await useEventStore.getState().createEvent(formData);
+
+      if (response && response.statusCode >= 200 && response.statusCode < 300) {
+        // Show success toast
+        toast({
+          title: "Created successfully",
+          description: response.message,
+        });
+
+        // Wait for 3 seconds before redirecting
+        setTimeout(() => {
+          router.push(`/admin/events/create/${response.data.uuid}/tickets`);
+
+        }, 2000);
+      } else {
+        setErrors((prev) => ({
+          ...prev,
+          submit: response.message || "Failed to create event",
+        }));
+        toast({
+          title: "Error!!!",
+          description: response.message || "Failed to create event",
+        });
+      }
+    } catch (error) {
+      console.error("Error creating event:", error);
+      setErrors((prev) => ({
+        ...prev,
+        submit: "An unexpected error occurred",
+      }));
+      toast({
+        title: "Error!!!",
+        description: "An unexpected error occurred.",
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
     <div className="max-w-5xl mx-auto">
-      <div className="mb-8">
-      <nav aria-label="Progress">
-  <ol className="flex items-center">
-    {steps.map((step, stepIdx) => {
-      const Icon = step.icon; // Extract the icon component
-      return (
-        <li
-          key={step.id}
-          className={`${stepIdx !== steps.length - 1 ? "pr-8 sm:pr-20" : ""} relative`}
-        >
-          <div className="flex items-center">
-            <button
-              onClick={() => setCurrentStep(step.id)}
-              className={`relative flex h-10 w-10 items-center justify-center rounded-full border-2 ${
-                step.id === currentStep
-                  ? "border-primary bg-primary text-white"
-                  : "border-gray-300 bg-white text-gray-500"
-              }`}
-            >
-              <Icon className="w-5 h-5" /> {/* Render the step icon */}
-            </button>
-            {stepIdx !== steps.length - 1 && (
-              <div
-                className={`absolute top-5 h-0.5 w-full ${
-                  steps.findIndex(s => s.id === currentStep) > stepIdx
-                    ? "bg-primary"
-                    : "bg-gray-200"
-                }`}
-              />
-            )}
-          </div>
-          <div className="mt-2 text-center">
-            <span className="text-sm font-medium">{step.name}</span>
-            <p className="text-sm text-gray-500">{step.description}</p>
-          </div>
-        </li>
-      );
-    })}
-  </ol>
-</nav>
-      </div>
+      <h1 className="text-2xl font-bold mb-2">Create Event</h1>
+      <p className="text-gray-500 mb-6">Enter all event details below.</p>
 
       <Card className="p-6">
         {currentStep === "details" && (
           <div className="space-y-6">
             <div className="border-2 border-dashed rounded-lg p-12 text-center">
-              <div className="mx-auto flex justify-center text-gray-400">
-                <ImageIcon className="h-12 w-12" />
-              </div>
-              <div className="mt-4">
-                <Button variant="outline">Upload cover image</Button>
-              </div>
-              <p className="text-xs text-gray-500 mt-2">
-                16:9 ratio recommended. Max file size 1MB
-              </p>
+              <CldUploadWidget
+                uploadPreset="my_preset" // Ensure this matches your Cloudinary preset
+                onSuccess={(results) => {
+                  setIsUploading(false); // Stop loading when upload is successful
+                  if (typeof results === "object" && results !== null) {
+                    const cloudinaryResults =
+                      results as CloudinaryUploadWidgetResults;
+
+                    if (
+                      cloudinaryResults.info &&
+                      typeof cloudinaryResults.info === "object" &&
+                      "secure_url" in cloudinaryResults.info
+                    ) {
+                      const secureUrl = cloudinaryResults.info.secure_url;
+                      setFormData((prev) => ({
+                        ...prev,
+                        eventImageUrl: secureUrl,
+                      }));
+                      console.log("✅ Image Uploaded:", secureUrl);
+                    } else {
+                      console.error(
+                        "❌ Upload response missing secure_url",
+                        cloudinaryResults
+                      );
+                    }
+                  } else {
+                    console.error(
+                      "❌ Unexpected upload response format:",
+                      results
+                    );
+                  }
+                }}
+              >
+                {({ open }) => (
+                  <div>
+                    {/* Image Preview */}
+                    <div className="mx-auto flex justify-center text-gray-400">
+                      {formData.eventImageUrl ? (
+                        <img
+                          src={formData.eventImageUrl}
+                          alt="Event cover"
+                          className="h-48 w-auto object-cover rounded-lg"
+                        />
+                      ) : (
+                        <ImageIcon className="h-12 w-12" />
+                      )}
+                    </div>
+
+                    {/* Upload Button - Always Available */}
+                    <div className="mt-4">
+                      <Button
+                        variant="outline"
+                        onClick={() => {
+                          setIsUploading(true);
+                          open(); // Opens Cloudinary Upload Widget
+                        }}
+                      >
+                        {isUploading ? "Uploading..." : "Upload Another Image"}
+                      </Button>
+                    </div>
+
+                    {/* Image Guidelines */}
+                    <p className="text-xs text-gray-500 mt-2">
+                      16:9 ratio recommended. Max file size 1MB
+                    </p>
+
+                    {/* Error Messages */}
+                    {errors.eventImageUrl && (
+                      <p className="text-red-500 text-sm mt-1">
+                        {errors.eventImageUrl}
+                      </p>
+                    )}
+                  </div>
+                )}
+              </CldUploadWidget>
             </div>
 
             <div>
               <Label htmlFor="title">Event title</Label>
-              <Input id="title" className="mt-1" placeholder="Enter event title" />
+              <Input
+                id="title"
+                className="mt-1"
+                placeholder="Enter event title"
+                value={formData.title}
+                onChange={(e) =>
+                  setFormData((prev) => ({ ...prev, title: e.target.value }))
+                }
+              />
+              {errors.title && (
+                <p className="text-red-500 text-sm mt-1">{errors.title}</p>
+              )}
             </div>
 
             <div>
               <Label htmlFor="category">Category</Label>
-              <Select>
+              <Select
+                value={formData.category}
+                onValueChange={(value) =>
+                  setFormData((prev) => ({ ...prev, category: value }))
+                }
+              >
                 <SelectTrigger className="mt-1">
                   <SelectValue placeholder="Select category" />
                 </SelectTrigger>
@@ -133,22 +278,37 @@ export default function CreateEventPage() {
                   <SelectItem value="seminar">Seminar</SelectItem>
                 </SelectContent>
               </Select>
+              {errors.category && (
+                <p className="text-red-500 text-sm mt-1">{errors.category}</p>
+              )}
             </div>
 
             <div>
-              <Label htmlFor="description">Description</Label>
+              <Label htmlFor="overview">Overview</Label>
               <Textarea
-                id="description"
+                id="overview"
                 className="mt-1"
                 placeholder="Write about your event"
                 rows={4}
+                value={formData.overview}
+                onChange={(e) =>
+                  setFormData((prev) => ({ ...prev, overview: e.target.value }))
+                }
               />
+              {errors.overview && (
+                <p className="text-red-500 text-sm mt-1">{errors.overview}</p>
+              )}
             </div>
 
             <div className="grid grid-cols-2 gap-6">
               <div>
-                <Label>Event type</Label>
-                <Select>
+                <Label>Event Type</Label>
+                <Select
+                  value={formData.eventType}
+                  onValueChange={(value) =>
+                    setFormData((prev) => ({ ...prev, eventType: value }))
+                  }
+                >
                   <SelectTrigger className="mt-1">
                     <SelectValue placeholder="Select type" />
                   </SelectTrigger>
@@ -157,134 +317,214 @@ export default function CreateEventPage() {
                     <SelectItem value="multi">Multi-Day Event</SelectItem>
                   </SelectContent>
                 </Select>
+                {errors.eventType && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {errors.eventType}
+                  </p>
+                )}
               </div>
               <div>
-                <Label>Event format</Label>
-                <Select>
+                <Label>Ticket Option</Label>
+                <Select
+                  value={formData.isPaidFor ? "true" : "false"}
+                  onValueChange={
+                    (value) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        isPaidFor: value === "true",
+                      })) // Convert back to boolean
+                  }
+                >
                   <SelectTrigger className="mt-1">
-                    <SelectValue placeholder="Select format" />
+                    <SelectValue placeholder="Select ticket option" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="physical">Physical</SelectItem>
-                    <SelectItem value="virtual">Virtual</SelectItem>
-                    <SelectItem value="hybrid">Hybrid</SelectItem>
+                    <SelectItem value="true">Paid Event</SelectItem>
+                    <SelectItem value="false">Not Paid Event</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
             </div>
-          </div>
-        )}
 
-        {currentStep === "schedule" && (
-          <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <h3 className="text-lg font-medium">Day 1 Schedule</h3>
-              <Button variant="outline">Add activity</Button>
+            <div className="grid grid-cols-3 gap-6">
+              <div>
+                <Label htmlFor="date">Date</Label>
+                <Input
+                  id="date"
+                  type="date"
+                  className="mt-1"
+                  value={formData.date}
+                  onChange={(e) =>
+                    setFormData((prev) => ({ ...prev, date: e.target.value }))
+                  }
+                />
+                {errors.date && (
+                  <p className="text-red-500 text-sm mt-1">{errors.date}</p>
+                )}
+              </div>
+              <div>
+                <Label htmlFor="startTime">Start Time</Label>
+                <Input
+                  id="startTime"
+                  type="time"
+                  className="mt-1"
+                  value={formData.startTime}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      startTime: e.target.value,
+                    }))
+                  }
+                />
+                {errors.startTime && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {errors.startTime}
+                  </p>
+                )}
+              </div>
+              <div>
+                <Label htmlFor="endTime">End Time</Label>
+                <Input
+                  id="endTime"
+                  type="time"
+                  className="mt-1"
+                  value={formData.endTime}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      endTime: e.target.value,
+                    }))
+                  }
+                />
+                {errors.endTime && (
+                  <p className="text-red-500 text-sm mt-1">{errors.endTime}</p>
+                )}
+              </div>
             </div>
 
-            <div className="space-y-4">
-              <Card className="p-4">
-                <div className="flex items-center gap-4">
-                  <div className="flex-1">
-                    <Input placeholder="Activity title" className="mb-2" />
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="flex items-center gap-2">
-                        <Clock className="w-4 h-4 text-gray-500" />
-                        <Input placeholder="Start time" />
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <User className="w-4 h-4 text-gray-500" />
-                        <Input placeholder="Speaker" />
-                      </div>
-                    </div>
-                  </div>
-                  <Button variant="ghost" size="icon">
-                    <Clock className="h-4 w-4" />
-                  </Button>
-                </div>
-              </Card>
-            </div>
-          </div>
-        )}
-
-        {currentStep === "ticket" && (
-          <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <h3 className="text-lg font-medium">Tickets</h3>
-              <Button variant="outline">Add ticket type</Button>
-            </div>
-
-            <div className="space-y-4">
-              <Card className="p-4">
-                <div className="space-y-4">
-                  <div>
-                    <Label>Ticket name</Label>
-                    <Input className="mt-1" placeholder="e.g., Early Bird, VIP, etc." />
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label>Price</Label>
-                      <Input className="mt-1" type="number" placeholder="0.00" />
-                    </div>
-                    <div>
-                      <Label>Quantity</Label>
-                      <Input className="mt-1" type="number" placeholder="100" />
-                    </div>
-                  </div>
-                  <div>
-                    <Label>Description</Label>
-                    <Textarea
-                      className="mt-1"
-                      placeholder="Describe what's included with this ticket"
-                      rows={2}
-                    />
-                  </div>
-                </div>
-              </Card>
-            </div>
-          </div>
-        )}
-
-        {currentStep === "preview" && (
-          <div className="space-y-6">
             <div>
-              <img
-                src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=1200&h=400&fit=crop&auto=format"
-                alt="Event cover"
-                className="w-full h-[300px] object-cover rounded-lg"
+              <Label htmlFor="venue">Venue</Label>
+              <Input
+                id="venue"
+                className="mt-1"
+                placeholder="Enter venue name"
+                value={formData.venue}
+                onChange={(e) =>
+                  setFormData((prev) => ({ ...prev, venue: e.target.value }))
+                }
               />
+              {errors.venue && (
+                <p className="text-red-500 text-sm mt-1">{errors.venue}</p>
+              )}
             </div>
 
             <div>
-              <h2 className="text-2xl font-bold mb-4">The Premier Conference</h2>
-              <p className="text-gray-600">
-                The Annual Professional Conference is an exciting gathering of industry experts...
-              </p>
+              <Label htmlFor="address">Address</Label>
+              <Input
+                id="address"
+                className="mt-1"
+                placeholder="Enter address"
+                value={formData.address}
+                onChange={(e) =>
+                  setFormData((prev) => ({ ...prev, address: e.target.value }))
+                }
+              />
+              {errors.address && (
+                <p className="text-red-500 text-sm mt-1">{errors.address}</p>
+              )}
             </div>
 
-            <div className="flex items-center gap-6 text-sm text-gray-500">
-              <div className="flex items-center gap-2">
-                <Calendar className="w-4 h-4" />
-                <span>Feb 22, 2025</span>
+            <div className="grid grid-cols-4 gap-6">
+              <div>
+                <Label htmlFor="postcode">Postcode</Label>
+                <Input
+                  id="postcode"
+                  className="mt-1"
+                  placeholder="Enter postcode"
+                  value={formData.postcode}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      postcode: e.target.value,
+                    }))
+                  }
+                />
+                {errors.postcode && (
+                  <p className="text-red-500 text-sm mt-1">{errors.postcode}</p>
+                )}
               </div>
-              <div className="flex items-center gap-2">
-                <Clock className="w-4 h-4" />
-                <span>10 AM - 12 AM</span>
+              <div>
+                <Label htmlFor="city">City</Label>
+                <Input
+                  id="city"
+                  className="mt-1"
+                  placeholder="Enter city"
+                  value={formData.city}
+                  onChange={(e) =>
+                    setFormData((prev) => ({ ...prev, city: e.target.value }))
+                  }
+                />
+                {errors.city && (
+                  <p className="text-red-500 text-sm mt-1">{errors.city}</p>
+                )}
+              </div>
+              <div>
+                <Label htmlFor="state">State</Label>
+                <Input
+                  id="state"
+                  className="mt-1"
+                  placeholder="Enter state"
+                  value={formData.state}
+                  onChange={(e) =>
+                    setFormData((prev) => ({ ...prev, state: e.target.value }))
+                  }
+                />
+                {errors.state && (
+                  <p className="text-red-500 text-sm mt-1">{errors.state}</p>
+                )}
+              </div>
+              <div>
+                <Label htmlFor="country">Country</Label>
+                <Input
+                  id="country"
+                  className="mt-1"
+                  placeholder="Enter country"
+                  value={formData.country}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      country: e.target.value,
+                    }))
+                  }
+                />
+                {errors.country && (
+                  <p className="text-red-500 text-sm mt-1">{errors.country}</p>
+                )}
               </div>
             </div>
+
+            {errors.submit && (
+              <p className="text-red-500 text-sm mt-4">{errors.submit}</p>
+            )}
           </div>
         )}
 
-        <div className="flex justify-between mt-8">
+        <div className="flex justify-between mt-16 mb-8">
           <Button
-            variant="outline"
-            onClick={handlePrev}
-            disabled={currentStep === steps[0].id}
+            type="submit"
+            className="w-full bg-[#27264E] hover:bg-[#1f1e3d] transition-colors"
+            disabled={isLoading}
+            onClick={handleNext}
           >
-            Previous
-          </Button>
-          <Button onClick={handleNext}>
-            {currentStep === steps[steps.length - 1].id ? "Create Event" : "Next"}
+            {isLoading ? (
+              <div className="flex items-center justify-center">
+                <div className="w-5 h-5 border-t-2 border-white rounded-full animate-spin" />
+              </div>
+            ) : (
+              <span className="flex items-center justify-center">
+                Create Event
+              </span>
+            )}
           </Button>
         </div>
       </Card>
