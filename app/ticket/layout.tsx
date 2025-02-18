@@ -15,10 +15,10 @@ export default function TicketLayout({
   };
 
   const navItems = [
-    { label: "About", href: "" },
-    { label: "Services  ", href: "" },
-    { label: "Events", href: "" },
-    // { label: "Tickets", href: "/ticket" }
+    { label: "About us", href: "/1#about" },
+    { label: "Events", href: "/1#events" },
+    { label: "Speakers", href: "/1#speakers" },
+    { label: "Tickets", href: "/ticket" }
   ];
 
   return (
@@ -27,7 +27,7 @@ export default function TicketLayout({
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <Link href="/" className="flex items-center space-x-2">
             <Image
-              src="/images/PH.png"
+              src="/images/PH_White.png"
               alt="PH Logo"
               width={30}
               height={30}

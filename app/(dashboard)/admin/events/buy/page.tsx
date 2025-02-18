@@ -170,7 +170,7 @@ export default function EventBuyPage() {
                 <p className="text-sm text-gray-500">Regular admission for one person</p>
               </div>
               <div className="text-right">
-                <p className="font-semibold">£12.56</p>
+                <p className="font-semibold">$12.56</p>
                 <p className="text-sm text-gray-500">100 remaining</p>
               </div>
             </div>
@@ -180,7 +180,7 @@ export default function EventBuyPage() {
                 <p className="text-sm text-gray-500">Admission for five people</p>
               </div>
               <div className="text-right">
-                <p className="font-semibold">£50.24</p>
+                <p className="font-semibold">$50.24</p>
                 <p className="text-sm text-gray-500">50 remaining</p>
               </div>
             </div>

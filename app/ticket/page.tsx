@@ -64,7 +64,7 @@ export default function TicketsPage() {
               <div>
                 <h3 className="font-semibold text-lg">{ticket.type}</h3>
                 <p className="text-gray-600 text-sm mt-1 max-w-md">{ticket.description}</p>
-                <p className="text-blue-600 font-semibold mt-2">£{ticket.price}</p>
+                <p className="text-blue-600 font-semibold mt-2">${ticket.price}</p>
               </div>
               <Select
                 value={selectedTickets[ticket.id]?.toString() || "0"}
@@ -95,23 +95,23 @@ export default function TicketsPage() {
             return (
               <div key={id} className="flex justify-between mb-4">
                 <span>{quantity}× STANDARD SINGLE (Admits 1)</span>
-                <span>£{(ticket?.price || 0) * quantity}</span>
+                <span>${(ticket?.price || 0) * quantity}</span>
               </div>
             );
           })}
           <div className="border-t pt-4 mt-4">
             <div className="flex justify-between mb-2">
               <span>Fees</span>
-              <span>£0</span>
+              <span>$0</span>
             </div>
             <div className="flex justify-between mb-4">
               <span>Subtotal</span>
-              <span>£{total.toFixed(2)}</span>
+              <span>${total.toFixed(2)}</span>
             </div>
             <button className="text-blue-600 text-sm mb-4">Add discount code</button>
             <div className="flex justify-between mb-6">
               <span className="font-semibold">Total</span>
-              <span className="font-semibold">£{(total + 1).toFixed(2)}</span>
+              <span className="font-semibold">${(total + 1).toFixed(2)}</span>
             </div>
             <Link href="/ticket/contact">
               <Button className="w-full">Get Tickets</Button>

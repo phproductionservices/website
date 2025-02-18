@@ -1,5 +1,5 @@
 "use client";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -53,14 +53,13 @@ const events = [
     category: "Conference",
     ticketsSold: 350,
     totalTickets: 500,
-    revenue: "£43,750",
-    // image : "",
-     image: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&h=500&fit=crop",
-    status: "",
+    revenue: "$43,750",
+    image: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&h=500&fit=crop",
+    status: "Active",
     ticketTypes: [
-      { type: "Early Bird", sold: 100, total: 100, price: "£99" },
-      { type: "Regular", sold: 200, total: 300, price: "£129" },
-      { type: "VIP", sold: 50, total: 100, price: "£299" }
+      { type: "Early Bird", sold: 100, total: 100, price: "$99" },
+      { type: "Regular", sold: 200, total: 300, price: "$129" },
+      { type: "VIP", sold: 50, total: 100, price: "$299" }
     ],
     recentAttendees: [
       { name: "John Doe", email: "john@example.com", ticketType: "VIP", purchaseDate: "2024-03-01" },
@@ -70,7 +69,7 @@ const events = [
     analytics: {
       dailyViews: 1200,
       conversionRate: "3.5%",
-      averageOrderValue: "£175",
+      averageOrderValue: "$175",
       topReferrers: ["Google", "Facebook", "Direct"]
     }
   },
@@ -83,15 +82,13 @@ const events = [
     category: "Festival",
     ticketsSold: 1500,
     totalTickets: 2000,
-    revenue: "£75,000",
-    // image : "",
+    revenue: "$75,000",
     image: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800&h=500&fit=crop",
-    status: "",
+    status: "Upcoming",
     ticketTypes: [
-      { type: "General Admission", sold: 1000, total: 1500, price: "£49" },
-      { type: "VIP", sold: 500, total: 500, price: "£149" }
-    ],
-    recentAttendees: []
+      { type: "General Admission", sold: 1000, total: 1500, price: "$49" },
+      { type: "VIP", sold: 500, total: 500, price: "$149" }
+    ]
   },
   {
     id: 3,
@@ -102,15 +99,13 @@ const events = [
     category: "Corporate",
     ticketsSold: 280,
     totalTickets: 300,
-    revenue: "£84,000",
-    // image : "",
+    revenue: "$84,000",
     image: "https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=800&h=500&fit=crop",
-    status: "",
+    status: "Almost Sold Out",
     ticketTypes: [
-      { type: "Professional", sold: 200, total: 200, price: "£299" },
-      { type: "Executive", sold: 80, total: 100, price: "£499" }
-    ],
-    recentAttendees: []
+      { type: "Professional", sold: 200, total: 200, price: "$299" },
+      { type: "Executive", sold: 80, total: 100, price: "$499" }
+    ]
   }
 ];
 
@@ -177,7 +172,7 @@ export default function AdminDashboard() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-500">Total Revenue</p>
-                  <p className="text-2xl font-bold">£202,750</p>
+                  <p className="text-2xl font-bold">$202,750</p>
                 </div>
                 <DollarSign className="w-8 h-8 text-green-500" />
               </div>
@@ -238,33 +233,52 @@ export default function AdminDashboard() {
             </Select>
           </div>
 
-          <div className="">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {filteredEvents.map((event) => (
-              <div className="bg-white rounded-lg shadow-md overflow-hidden">
-              <table key={event.id} className="w-full cursor-pointer hover:shadow-lg transition-shadow" onClick={() => setSelectedEvent(event)}>
-              <tbody>
-                <tr>
-                
-                  <td rowSpan={4}className="relative w-48 p-0">
-                  </td>
-                  <td className="p-4">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <h3 className="font-semibold text-lg mb-2">{event.title}</h3>
+              <Card 
+                key={event.id} 
+                className="cursor-pointer hover:shadow-lg transition-shadow"
+                onClick={() => setSelectedEvent(event)}
+              >
+                <div className="relative h-48">
+                  <img
+                    src={event.image}
+                    alt={event.title}
+                    className="w-full h-full object-cover rounded-t-lg"
+                  />
+                  <Badge className={`absolute top-4 right-4 ${getStatusColor(event.status)}`}>
+                    {event.status}
+                  </Badge>
+                </div>
+                <div className="p-6">
+                  <div className="flex justify-between items-start mb-4">
+                    <div>
+                      <h3 className="font-semibold text-lg mb-2">{event.title}</h3>
+                      <div className="flex items-center text-sm text-gray-500">
+                        <Clock className="w-4 h-4 mr-1" />
+                        <span>{event.date}</span>
                       </div>
-                      <span className="text-blue-600 font-semibold">{event.revenue}</span>
+                      <div className="flex items-center text-sm text-gray-500 mt-1">
+                        <MapPin className="w-4 h-4 mr-1" />
+                        <span>{event.location}</span>
+                      </div>
                     </div>
-                  </td>
-                </tr>
-                <tr>
-                  <td className="p-4 pt-0">
-                    <div className="space-y-2">
+                    <span className="text-blue-600 font-semibold">{event.revenue}</span>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Tickets Sold</span>
+                      <span>{event.ticketsSold}/{event.totalTickets}</span>
                     </div>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-            </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div
+                        className="bg-blue-600 rounded-full h-2"
+                        style={{ width: `${calculateProgress(event.ticketsSold, event.totalTickets)}%` }}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </Card>
             ))}
           </div>
         </>
@@ -282,7 +296,7 @@ export default function AdminDashboard() {
           </div>
 
           <div className="flex gap-4 border-b">
-            {["overview", "attendees",].map((tab) => (
+            {["overview", "analytics", "attendees", "settings"].map((tab) => (
               <button
                 key={tab}
                 className={`px-4 py-2 font-medium ${
@@ -389,7 +403,7 @@ export default function AdminDashboard() {
                         <BarChart2 className="w-5 h-5 text-blue-600 mr-3" />
                         <div>
                           <p className="text-sm text-gray-500">Conversion Rate</p>
-                          {/* <p className="font-semibold">{selectedEvent.analytics.conversionRate}</p> */}
+                          <p className="font-semibold">{selectedEvent.analytics.conversionRate}</p>
                         </div>
                       </div>
                     </div>
@@ -536,7 +550,7 @@ export default function AdminDashboard() {
                 <h3 className="text-lg font-semibold mb-6">Event Settings</h3>
                 <div className="space-y-4">
                   <div>
-                  
+                    <Label>Event Visibility</Label>
                     <Select defaultValue="public">
                       <SelectTrigger>
                         <SelectValue placeholder="Select visibility" />
@@ -548,9 +562,12 @@ export default function AdminDashboard() {
                       </SelectContent>
                     </Select>
                   </div>
-                 
                   <div>
-                  
+                    <Label>Registration Deadline</Label>
+                    <Input type="datetime-local" />
+                  </div>
+                  <div>
+                    <Label>Maximum Tickets per Order</Label>
                     <Input type="number" defaultValue="10" />
                   </div>
                 </div>
