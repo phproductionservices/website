@@ -1,5 +1,5 @@
 "use client";
-
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -54,8 +54,9 @@ const events = [
     ticketsSold: 350,
     totalTickets: 500,
     revenue: "£43,750",
-    image: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&h=500&fit=crop",
-    status: "Active",
+    // image : "",
+     image: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&h=500&fit=crop",
+    status: "",
     ticketTypes: [
       { type: "Early Bird", sold: 100, total: 100, price: "£99" },
       { type: "Regular", sold: 200, total: 300, price: "£129" },
@@ -83,12 +84,14 @@ const events = [
     ticketsSold: 1500,
     totalTickets: 2000,
     revenue: "£75,000",
+    // image : "",
     image: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800&h=500&fit=crop",
-    status: "Upcoming",
+    status: "",
     ticketTypes: [
       { type: "General Admission", sold: 1000, total: 1500, price: "£49" },
       { type: "VIP", sold: 500, total: 500, price: "£149" }
-    ]
+    ],
+    recentAttendees: []
   },
   {
     id: 3,
@@ -100,12 +103,14 @@ const events = [
     ticketsSold: 280,
     totalTickets: 300,
     revenue: "£84,000",
+    // image : "",
     image: "https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=800&h=500&fit=crop",
-    status: "Almost Sold Out",
+    status: "",
     ticketTypes: [
       { type: "Professional", sold: 200, total: 200, price: "£299" },
       { type: "Executive", sold: 80, total: 100, price: "£499" }
-    ]
+    ],
+    recentAttendees: []
   }
 ];
 
@@ -233,52 +238,33 @@ export default function AdminDashboard() {
             </Select>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="">
             {filteredEvents.map((event) => (
-              <Card 
-                key={event.id} 
-                className="cursor-pointer hover:shadow-lg transition-shadow"
-                onClick={() => setSelectedEvent(event)}
-              >
-                <div className="relative h-48">
-                  <img
-                    src={event.image}
-                    alt={event.title}
-                    className="w-full h-full object-cover rounded-t-lg"
-                  />
-                  <Badge className={`absolute top-4 right-4 ${getStatusColor(event.status)}`}>
-                    {event.status}
-                  </Badge>
-                </div>
-                <div className="p-6">
-                  <div className="flex justify-between items-start mb-4">
-                    <div>
-                      <h3 className="font-semibold text-lg mb-2">{event.title}</h3>
-                      <div className="flex items-center text-sm text-gray-500">
-                        <Clock className="w-4 h-4 mr-1" />
-                        <span>{event.date}</span>
+              <div className="bg-white rounded-lg shadow-md overflow-hidden">
+              <table key={event.id} className="w-full cursor-pointer hover:shadow-lg transition-shadow" onClick={() => setSelectedEvent(event)}>
+              <tbody>
+                <tr>
+                
+                  <td rowSpan={4}className="relative w-48 p-0">
+                  </td>
+                  <td className="p-4">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <h3 className="font-semibold text-lg mb-2">{event.title}</h3>
                       </div>
-                      <div className="flex items-center text-sm text-gray-500 mt-1">
-                        <MapPin className="w-4 h-4 mr-1" />
-                        <span>{event.location}</span>
-                      </div>
+                      <span className="text-blue-600 font-semibold">{event.revenue}</span>
                     </div>
-                    <span className="text-blue-600 font-semibold">{event.revenue}</span>
-                  </div>
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Tickets Sold</span>
-                      <span>{event.ticketsSold}/{event.totalTickets}</span>
+                  </td>
+                </tr>
+                <tr>
+                  <td className="p-4 pt-0">
+                    <div className="space-y-2">
                     </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div
-                        className="bg-blue-600 rounded-full h-2"
-                        style={{ width: `${calculateProgress(event.ticketsSold, event.totalTickets)}%` }}
-                      />
-                    </div>
-                  </div>
-                </div>
-              </Card>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            </div>
             ))}
           </div>
         </>
@@ -403,7 +389,7 @@ export default function AdminDashboard() {
                         <BarChart2 className="w-5 h-5 text-blue-600 mr-3" />
                         <div>
                           <p className="text-sm text-gray-500">Conversion Rate</p>
-                          <p className="font-semibold">{selectedEvent.analytics.conversionRate}</p>
+                          {/* <p className="font-semibold">{selectedEvent.analytics.conversionRate}</p> */}
                         </div>
                       </div>
                     </div>
