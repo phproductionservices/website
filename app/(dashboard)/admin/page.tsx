@@ -6,6 +6,14 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { 
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { 
   Clock, 
   MapPin, 
   Search, 
@@ -19,7 +27,9 @@ import {
   Calendar,
   DollarSign,
   TrendingUp,
-  AlertCircle
+  AlertCircle,
+  MoreHorizontal,
+  Eye
 } from "lucide-react";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
@@ -53,13 +63,14 @@ const events = [
     category: "Conference",
     ticketsSold: 350,
     totalTickets: 500,
-    revenue: "$43,750",
-    image: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&h=500&fit=crop",
+    revenue: "£43,750",
     status: "Active",
+    image: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&h=500&fit=crop",
+    attendees: "500+",
     ticketTypes: [
-      { type: "Early Bird", sold: 100, total: 100, price: "$99" },
-      { type: "Regular", sold: 200, total: 300, price: "$129" },
-      { type: "VIP", sold: 50, total: 100, price: "$299" }
+      { type: "Early Bird", sold: 100, total: 100, price: "£99" },
+      { type: "Regular", sold: 200, total: 300, price: "£129" },
+      { type: "VIP", sold: 50, total: 100, price: "£299" }
     ],
     recentAttendees: [
       { name: "John Doe", email: "john@example.com", ticketType: "VIP", purchaseDate: "2024-03-01" },
@@ -69,7 +80,7 @@ const events = [
     analytics: {
       dailyViews: 1200,
       conversionRate: "3.5%",
-      averageOrderValue: "$175",
+      averageOrderValue: "£175",
       topReferrers: ["Google", "Facebook", "Direct"]
     }
   },
@@ -82,13 +93,15 @@ const events = [
     category: "Festival",
     ticketsSold: 1500,
     totalTickets: 2000,
-    revenue: "$75,000",
-    image: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800&h=500&fit=crop",
+    revenue: "£75,000",
     status: "Upcoming",
+    image: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800&h=500&fit=crop",
+    attendees: "2000+",
     ticketTypes: [
-      { type: "General Admission", sold: 1000, total: 1500, price: "$49" },
-      { type: "VIP", sold: 500, total: 500, price: "$149" }
-    ]
+      { type: "General Admission", sold: 1000, total: 1500, price: "£49" },
+      { type: "VIP", sold: 500, total: 500, price: "£149" }
+    ],
+    recentAttendees: []
   },
   {
     id: 3,
@@ -99,13 +112,15 @@ const events = [
     category: "Corporate",
     ticketsSold: 280,
     totalTickets: 300,
-    revenue: "$84,000",
-    image: "https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=800&h=500&fit=crop",
+    revenue: "£84,000",
     status: "Almost Sold Out",
+    image: "https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=800&h=500&fit=crop",
+    attendees: "300",
     ticketTypes: [
-      { type: "Professional", sold: 200, total: 200, price: "$299" },
-      { type: "Executive", sold: 80, total: 100, price: "$499" }
-    ]
+      { type: "Professional", sold: 200, total: 200, price: "£299" },
+      { type: "Executive", sold: 80, total: 100, price: "£499" }
+    ],
+    recentAttendees: []
   }
 ];
 
@@ -172,7 +187,7 @@ export default function AdminDashboard() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-500">Total Revenue</p>
-                  <p className="text-2xl font-bold">$202,750</p>
+                  <p className="text-2xl font-bold">£202,750</p>
                 </div>
                 <DollarSign className="w-8 h-8 text-green-500" />
               </div>
@@ -210,7 +225,7 @@ export default function AdminDashboard() {
             </Card>
           </div>
 
-          <div className="flex gap-4">
+          <div className="flex gap-4 mb-6">
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
               <Input
@@ -233,54 +248,81 @@ export default function AdminDashboard() {
             </Select>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {filteredEvents.map((event) => (
-              <Card 
-                key={event.id} 
-                className="cursor-pointer hover:shadow-lg transition-shadow"
-                onClick={() => setSelectedEvent(event)}
-              >
-                <div className="relative h-48">
-                  <img
-                    src={event.image}
-                    alt={event.title}
-                    className="w-full h-full object-cover rounded-t-lg"
-                  />
-                  <Badge className={`absolute top-4 right-4 ${getStatusColor(event.status)}`}>
-                    {event.status}
-                  </Badge>
-                </div>
-                <div className="p-6">
-                  <div className="flex justify-between items-start mb-4">
-                    <div>
-                      <h3 className="font-semibold text-lg mb-2">{event.title}</h3>
+          <Card className="p-6">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Event</TableHead>
+                  <TableHead>Date & Time</TableHead>
+                  <TableHead>Location</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Sales</TableHead>
+                  <TableHead>Revenue</TableHead>
+                  <TableHead>Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredEvents.map((event) => (
+                  <TableRow key={event.id} className="cursor-pointer hover:bg-gray-50" onClick={() => setSelectedEvent(event)}>
+                    <TableCell>
+                      <div className="flex items-center gap-3">
+                        <img 
+                          src={event.image} 
+                          alt={event.title}
+                          className="w-12 h-12 rounded-lg object-cover"
+                        />
+                        <div>
+                          <div className="font-medium">{event.title}</div>
+                          <div className="text-sm text-gray-500">{event.category}</div>
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="text-sm">
+                        <div>{event.date}</div>
+                        <div className="text-gray-500">{event.time}</div>
+                      </div>
+                    </TableCell>
+                    <TableCell>
                       <div className="flex items-center text-sm text-gray-500">
-                        <Clock className="w-4 h-4 mr-1" />
-                        <span>{event.date}</span>
-                      </div>
-                      <div className="flex items-center text-sm text-gray-500 mt-1">
                         <MapPin className="w-4 h-4 mr-1" />
-                        <span>{event.location}</span>
+                        {event.location}
                       </div>
-                    </div>
-                    <span className="text-blue-600 font-semibold">{event.revenue}</span>
-                  </div>
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Tickets Sold</span>
-                      <span>{event.ticketsSold}/{event.totalTickets}</span>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div
-                        className="bg-blue-600 rounded-full h-2"
-                        style={{ width: `${calculateProgress(event.ticketsSold, event.totalTickets)}%` }}
-                      />
-                    </div>
-                  </div>
-                </div>
-              </Card>
-            ))}
-          </div>
+                    </TableCell>
+                    <TableCell>
+                      <Badge className={getStatusColor(event.status)}>
+                        {event.status}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <div className="text-sm">
+                        <div className="font-medium">{event.ticketsSold}/{event.totalTickets}</div>
+                        <div className="w-24 h-1.5 bg-gray-200 rounded-full mt-1">
+                          <div 
+                            className="h-full bg-blue-600 rounded-full"
+                            style={{ width: `${calculateProgress(event.ticketsSold, event.totalTickets)}%` }}
+                          />
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="font-medium text-blue-600">{event.revenue}</div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <Button variant="ghost" size="icon">
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                        <Button variant="ghost" size="icon">
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </Card>
         </>
       ) : (
         <div className="space-y-8">
@@ -296,7 +338,7 @@ export default function AdminDashboard() {
           </div>
 
           <div className="flex gap-4 border-b">
-            {["overview", "analytics", "attendees", "settings"].map((tab) => (
+            {["overview", "attendees"].map((tab) => (
               <button
                 key={tab}
                 className={`px-4 py-2 font-medium ${
@@ -403,7 +445,7 @@ export default function AdminDashboard() {
                         <BarChart2 className="w-5 h-5 text-blue-600 mr-3" />
                         <div>
                           <p className="text-sm text-gray-500">Conversion Rate</p>
-                          <p className="font-semibold">{selectedEvent.analytics.conversionRate}</p>
+                          <p className="font-semibold">{selectedEvent.analytics?.conversionRate}</p>
                         </div>
                       </div>
                     </div>
@@ -472,38 +514,6 @@ export default function AdminDashboard() {
             </div>
           )}
 
-          {activeTab === "analytics" && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <Card className="p-6">
-                <h3 className="text-lg font-semibold mb-6">Traffic Sources</h3>
-                <div className="space-y-4">
-                  {selectedEvent.analytics.topReferrers.map((referrer: string, index: number) => (
-                    <div key={index} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                      <span>{referrer}</span>
-                      <span className="text-blue-600 font-medium">
-                        {Math.floor(Math.random() * 1000)} visits
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </Card>
-              
-              <Card className="p-6">
-                <h3 className="text-lg font-semibold mb-6">Key Metrics</h3>
-                <div className="space-y-4">
-                  <div className="p-4 bg-gray-50 rounded-lg">
-                    <p className="text-sm text-gray-500">Daily Page Views</p>
-                    <p className="text-2xl font-bold">{selectedEvent.analytics.dailyViews}</p>
-                  </div>
-                  <div className="p-4 bg-gray-50 rounded-lg">
-                    <p className="text-sm text-gray-500">Average Order Value</p>
-                    <p className="text-2xl font-bold">{selectedEvent.analytics.averageOrderValue}</p>
-                  </div>
-                </div>
-              </Card>
-            </div>
-          )}
-
           {activeTab === "attendees" && (
             <Card className="p-6">
               <div className="flex justify-between items-center mb-6">
@@ -542,55 +552,6 @@ export default function AdminDashboard() {
                 </table>
               </div>
             </Card>
-          )}
-
-          {activeTab === "settings" && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <Card className="p-6">
-                <h3 className="text-lg font-semibold mb-6">Event Settings</h3>
-                <div className="space-y-4">
-                  <div>
-                    <Label>Event Visibility</Label>
-                    <Select defaultValue="public">
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select visibility" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="public">Public</SelectItem>
-                        <SelectItem value="private">Private</SelectItem>
-                        <SelectItem value="draft">Draft</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <Label>Registration Deadline</Label>
-                    <Input type="datetime-local" />
-                  </div>
-                  <div>
-                    <Label>Maximum Tickets per Order</Label>
-                    <Input type="number" defaultValue="10" />
-                  </div>
-                </div>
-              </Card>
-
-              <Card className="p-6">
-                <h3 className="text-lg font-semibold mb-6">Notification Settings</h3>
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <span>Email notifications</span>
-                    <Button variant="outline" size="sm">Configure</Button>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span>SMS notifications</span>
-                    <Button variant="outline" size="sm">Configure</Button>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span>Reminder schedule</span>
-                    <Button variant="outline" size="sm">Configure</Button>
-                  </div>
-                </div>
-              </Card>
-            </div>
           )}
         </div>
       )}
