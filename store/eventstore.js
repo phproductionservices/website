@@ -38,6 +38,7 @@ const useEventStore = create(
     allevents: [],
     addedevents: {},
     workshops: [],
+    eventData: {},
     addedWorkshop: {},
     addedTickes: [],
     setRehydrationComplete: (status) => set({ rehydrationComplete: status }),
@@ -96,6 +97,18 @@ const useEventStore = create(
       }
       return result;
     },
+
+    fetchEventbyUUID: async (uuid) => {
+      const result = await makeAuthenticatedRequest("get", `event/${uuid}`); 
+      if (result && result.statusCode >= 200 && result.statusCode < 300) {
+        set({ eventData: result.data });
+        console.log("Fetched Event Data:", result.data);
+      } else {
+        console.error("Failed to fetch event:", result);
+      }
+      return result;
+    },
+    
 
     clearEvents: () => set({ allevents: [] }),
   }))
