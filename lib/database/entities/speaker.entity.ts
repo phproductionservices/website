@@ -10,8 +10,8 @@ export class Speaker extends BaseEntity {
   @Column()
   description!: string;
 
-  @Column()
-  imageUrl!: string;
+  @Column({nullable : true})
+  imageUrl?: string;
 
   @ManyToOne(() => Workshop, (workshop) => workshop.speakers)
   @JoinColumn()

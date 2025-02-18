@@ -65,13 +65,15 @@ export async function POST(request: Request) {
 
     // Check if event with the same slug exists
     const existingEvent = await eventRepo.findOne({ where: { slug } });
-
     if (existingEvent) {
       return NextResponse.json(
         { message: "Event already exists with similar name", status: 400, error: true },
         { status: 400 }
       );
     }
+
+    const fullStartTime = new Date(`${date}T${startTime}:00`);
+    const fullEndTime = new Date(`${date}T${endTime}:00`);
 
     const event = eventRepo.create({ 
       title,
@@ -80,8 +82,8 @@ export async function POST(request: Request) {
       category,
       eventType,
       date: new Date(date),
-      startTime: new Date(startTime),
-      endTime: new Date(endTime),
+      startTime: fullStartTime,
+      endTime: fullEndTime,
       venue,
       address,
       eventImageUrl,

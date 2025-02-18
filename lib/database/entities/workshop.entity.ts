@@ -1,4 +1,4 @@
-import { Entity, Column, ManyToOne, OneToMany, JoinColumn } from "typeorm";
+import { Entity, Column, ManyToOne, OneToMany, JoinColumn, OneToOne } from "typeorm";
 import { BaseEntity } from "./base.entity";
 import { Registration } from "./registration.entity";
 import { Speaker } from "./speaker.entity";
@@ -8,11 +8,14 @@ export class Workshop extends BaseEntity {
   @Column()
   title!: string;
 
-  @Column()
-  startTime!: Date;
+  @Column({ type: "date", nullable: false })
+  date!: Date;
 
   @Column()
-  endTime!: Date;
+  startTime!: string;
+
+  @Column()
+  endTime!: string;
 
   @Column()
   description!: string;
@@ -24,9 +27,9 @@ export class Workshop extends BaseEntity {
   @JoinColumn()
   event!: any;
 
-  @ManyToOne("Ticket", "workshops")
+  @OneToMany("Ticket", "workshops")
   @JoinColumn()
-  ticket!: any;
+  ticket!: any[];
 
   @OneToMany(() => Registration, (registration) => registration.workshop)
   registrations!: Registration[];

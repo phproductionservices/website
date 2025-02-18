@@ -1,11 +1,18 @@
-import { Entity, Column, ManyToOne, OneToMany, JoinColumn } from "typeorm";
+import { Entity, Column, ManyToOne, OneToMany, JoinColumn, OneToOne } from "typeorm";
 import { BaseEntity } from "./base.entity";
 import { Registration } from "./registration.entity";
+import { TicketType } from "@/lib/base";
 
 @Entity()
 export class Ticket extends BaseEntity {
-  @Column()
-  type!: string;
+  @Column(
+    {
+      type: "enum",
+      enum: TicketType,
+      default: TicketType.Event,
+    }
+  )
+  type!: TicketType;
 
   @Column()
   name!: string;
@@ -16,19 +23,14 @@ export class Ticket extends BaseEntity {
   @Column("int")
   quantity!: number;
 
-  @Column()
-  salesStartDate!: Date;
-
-  @Column()
-  salesEndDate!: Date;
-
-  @ManyToOne("Event", "tickets")
+  @ManyToOne("Event", "tickets", { nullable: true })
   @JoinColumn()
   event!: any;
 
   @OneToMany(() => Registration, (registration) => registration.ticket)
   registrations!: Registration[];
 
-  @OneToMany("Workshop", "ticket")
-  workshops!: any[];
+  @ManyToOne("Workshop", "ticket", { nullable: true })
+  @JoinColumn()
+  workshops!: any;
 }
