@@ -111,10 +111,10 @@ export default function Home() {
   };
 
   const navItems = [
-    { label: "About us", action: () => scrollToSection('about') },
+    { label: "About", action: () => scrollToSection('') },
    
-    { label: "Speakers", action: () => scrollToSection('speakers') },
-    { label: "Tickets", href: "/ticket" }
+    { label: "Service", action: () => scrollToSection('') },
+    { label: "Events", href: "" }
   ];
 
   return (

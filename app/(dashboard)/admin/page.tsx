@@ -130,12 +130,34 @@ export default function AdminDashboard() {
   const [categoryFilter, setCategoryFilter] = useState("All");
   const [activeTab, setActiveTab] = useState("overview");
   const [showEmailModal, setShowEmailModal] = useState(false);
-
+  const [attendeeSearchQuery, setAttendeeSearchQuery] = useState(""); 
+  const [searchType, setSearchType] = useState("event");
+  const [selectedTicketType, setSelectedTicketType] = useState("All");
+  
   const filteredEvents = events.filter(event => {
     const matchesSearch = event.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          event.location.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCategory = categoryFilter === "All" || event.category === categoryFilter;
     return matchesSearch && matchesCategory;
+  });
+
+  const filteredAttendees = selectedEvent?.recentAttendees?.filter((attendee: any) => {
+    if (searchType === "event") {
+      return attendee.name.toLowerCase().includes(attendeeSearchQuery.toLowerCase()) ||
+             attendee.email.toLowerCase().includes(attendeeSearchQuery.toLowerCase()) ||
+             attendee.ticketType.toLowerCase().includes(attendeeSearchQuery.toLowerCase());
+    } else if (searchType === "workshop") {
+      // Add logic to filter by workshop if applicable
+      return attendee.workshop?.toLowerCase().includes(attendeeSearchQuery.toLowerCase());
+    }
+    return true; // Default to no filtering if no search type is selected
+  });
+
+  const filteredeventType = selectedEvent?.recentAttendees?.filter((attendee: any) => {
+    if (selectedTicketType === "All") {
+      return true;
+    }
+    return attendee.ticketType === selectedTicketType;
   });
 
   const getStatusColor = (status: string) => {
@@ -352,7 +374,6 @@ export default function AdminDashboard() {
               </button>
             ))}
           </div>
-
           {activeTab === "overview" && (
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               <div className="lg:col-span-2 space-y-6">
@@ -514,14 +535,40 @@ export default function AdminDashboard() {
             </div>
           )}
 
-          {activeTab === "attendees" && (
+{activeTab === "attendees" && (
             <Card className="p-6">
               <div className="flex justify-between items-center mb-6">
                 <h3 className="text-lg font-semibold">Attendee List</h3>
-                <Button variant="outline" onClick={handleDownloadAttendees}>
-                  <Download className="w-4 h-4 mr-2" />
-                  Export CSV
-                </Button>
+                <div className="flex gap-4">
+                  <div className="flex-1 relative">
+                    <Select value={searchType} onValueChange={setSearchType}>
+                      <SelectTrigger className="w-[180px]">
+                        <SelectValue placeholder="Search by" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="event">Event</SelectItem>
+                        <SelectItem value="workshop">Workshop</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="flex-1 relative">
+                    <Select value={selectedTicketType} onValueChange={setSelectedTicketType}>
+                      <SelectTrigger className="w-[180px]">
+                        <SelectValue placeholder="Ticket Type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="All">All Ticket Types</SelectItem>
+                        {selectedEvent.ticketTypes.map((ticket: any, index: number) => (
+                          <SelectItem key={index} value={ticket.type}>{ticket.type}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <Button variant="outline" onClick={handleDownloadAttendees}>
+                    <Download className="w-4 h-4 mr-2" />
+                    Export CSV
+                  </Button>
+                </div>
               </div>
               <div className="overflow-x-auto">
                 <table className="w-full">
@@ -535,20 +582,35 @@ export default function AdminDashboard() {
                     </tr>
                   </thead>
                   <tbody>
-                    {selectedEvent.recentAttendees.map((attendee: any, index: number) => (
-                      <tr key={index} className="border-b">
-                        <td className="p-4">{attendee.name}</td>
-                        <td className="p-4">{attendee.email}</td>
-                        <td className="p-4">{attendee.ticketType}</td>
-                        <td className="p-4">{attendee.purchaseDate}</td>
-                        <td className="p-4">
-                          <Button variant="ghost" size="sm">
-                            <Mail className="w-4 h-4" />
-                          </Button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
+  {filteredAttendees?.map((attendee: any, index: number) => (
+    <tr key={index} className="border-b">
+      <td className="p-4">{attendee.name}</td>
+      <td className="p-4">{attendee.email}</td>
+      <td className="p-4">{attendee.ticketType}</td>
+      <td className="p-4">{attendee.purchaseDate}</td>
+      <td className="p-4">
+        <Button variant="ghost" size="sm">
+          <Mail className="w-4 h-4" />
+        </Button>
+      </td>
+    </tr>
+  ))}
+
+  {filteredeventType?.map((attendee: any, index: number) => (
+    <tr key={index} className="border-b">
+      <td className="p-4">{attendee.name}</td>
+      <td className="p-4">{attendee.email}</td>
+      <td className="p-4">{attendee.ticketType}</td>
+      <td className="p-4">{attendee.purchaseDate}</td>
+      <td className="p-4">
+        <Button variant="ghost" size="sm">
+          <Mail className="w-4 h-4" />
+        </Button>
+      </td>
+    </tr>
+  ))}
+</tbody>
+
                 </table>
               </div>
             </Card>
