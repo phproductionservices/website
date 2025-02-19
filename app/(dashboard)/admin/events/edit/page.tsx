@@ -24,30 +24,76 @@ const mockEvent = {
   image: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=1200&h=400&fit=crop&auto=format"
 };
 
-// // Generate static params for all event IDs
-// export async function generateStaticParams() {
-//   // In a real application, you would fetch all event IDs from your data source
-//   // For now, we'll generate params for a few mock IDs
-//   return [
-//     { id: '1' },
-//     { id: '2' },
-//     { id: '3' },
-//     { id: '4' }
-//   ];
-//}
-
 export default function EditEventPage() {
   const [event, setEvent] = useState(mockEvent);
   const [isLoading, setIsLoading] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({}); // State for validation errors
   const router = useRouter();
+
+  const validateForm = () => {
+    const newErrors: Record<string, string> = {};
+
+    // Validate title
+    if (!event.title.trim()) {
+      newErrors.title = "Event title is required.";
+    }
+
+    // Validate description
+    if (!event.description.trim()) {
+      newErrors.description = "Event description is required.";
+    }
+
+    // Validate category
+    if (!event.category.trim()) {
+      newErrors.category = "Event category is required.";
+    }
+
+    // Validate format
+    if (!event.format.trim()) {
+      newErrors.format = "Event format is required.";
+    }
+
+    // Validate date
+    if (!event.date.trim()) {
+      newErrors.date = "Event date is required.";
+    } else if (new Date(event.date) < new Date()) {
+      newErrors.date = "Event date must be in the future.";
+    }
+
+    // Validate start time
+    if (!event.startTime.trim()) {
+      newErrors.startTime = "Start time is required.";
+    }
+
+    // Validate end time
+    if (!event.endTime.trim()) {
+      newErrors.endTime = "End time is required.";
+    } else if (event.endTime <= event.startTime) {
+      newErrors.endTime = "End time must be after start time.";
+    }
+
+    // Validate location
+    if (!event.location.trim()) {
+      newErrors.location = "Event location is required.";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0; // Return true if no errors
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Validate the form
+    if (!validateForm()) {
+      return; // Stop submission if validation fails
+    }
+
     setIsLoading(true);
-    
+
     // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 1000));
-    
+
     setIsLoading(false);
     router.push("/admin/events");
   };
@@ -65,8 +111,8 @@ export default function EditEventPage() {
       </div>
 
       <div className="flex justify-between items-center mb-8">
-      <Link href={`/`}>
-        <h1 className="text-2xl font-semibold">Edit Event</h1>
+        <Link href={`/`}>
+          <h1 className="text-2xl font-semibold">Edit Event</h1>
         </Link>
         <Button variant="destructive">Delete Event</Button>
       </div>
@@ -103,6 +149,7 @@ export default function EditEventPage() {
                 onChange={(e) => setEvent({ ...event, title: e.target.value })}
                 className="mt-1"
               />
+              {errors.title && <p className="text-sm text-red-500 mt-1">{errors.title}</p>}
             </div>
 
             <div>
@@ -114,6 +161,7 @@ export default function EditEventPage() {
                 className="mt-1"
                 rows={4}
               />
+              {errors.description && <p className="text-sm text-red-500 mt-1">{errors.description}</p>}
             </div>
 
             <div className="grid grid-cols-2 gap-4">
@@ -132,6 +180,7 @@ export default function EditEventPage() {
                     <SelectItem value="seminar">Seminar</SelectItem>
                   </SelectContent>
                 </Select>
+                {errors.category && <p className="text-sm text-red-500 mt-1">{errors.category}</p>}
               </div>
 
               <div>
@@ -149,6 +198,7 @@ export default function EditEventPage() {
                     <SelectItem value="hybrid">Hybrid</SelectItem>
                   </SelectContent>
                 </Select>
+                {errors.format && <p className="text-sm text-red-500 mt-1">{errors.format}</p>}
               </div>
             </div>
           </div>
@@ -166,6 +216,7 @@ export default function EditEventPage() {
                   onChange={(e) => setEvent({ ...event, date: e.target.value })}
                   className="mt-1"
                 />
+                {errors.date && <p className="text-sm text-red-500 mt-1">{errors.date}</p>}
               </div>
               <div>
                 <Label htmlFor="startTime">Start time</Label>
@@ -176,6 +227,7 @@ export default function EditEventPage() {
                   onChange={(e) => setEvent({ ...event, startTime: e.target.value })}
                   className="mt-1"
                 />
+                {errors.startTime && <p className="text-sm text-red-500 mt-1">{errors.startTime}</p>}
               </div>
               <div>
                 <Label htmlFor="endTime">End time</Label>
@@ -186,6 +238,7 @@ export default function EditEventPage() {
                   onChange={(e) => setEvent({ ...event, endTime: e.target.value })}
                   className="mt-1"
                 />
+                {errors.endTime && <p className="text-sm text-red-500 mt-1">{errors.endTime}</p>}
               </div>
             </div>
           </div>
@@ -201,6 +254,7 @@ export default function EditEventPage() {
                 onChange={(e) => setEvent({ ...event, location: e.target.value })}
                 className="mt-1"
               />
+              {errors.location && <p className="text-sm text-red-500 mt-1">{errors.location}</p>}
             </div>
           </div>
 
