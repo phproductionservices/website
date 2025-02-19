@@ -13,8 +13,34 @@ export async function GET(
     const db = await initializeDB();
     const eventRepo = db.getRepository(Event);
 
+    // ✅ Select only the fields you need
     const event = await eventRepo.findOne({
       where: { uuid: params.uuid },
+      relations: ["workshops", "workshops.ticket", "tickets"],
+      select: [
+        "id",
+        "uuid",
+        "created_at",
+        "updated_at",
+        "slug",
+        "title",
+        "category",
+        "overview",
+        "eventType",
+        "date",
+        "startTime",
+        "endTime",
+        "venue",
+        "address",
+        "postcode",
+        "eventImageUrl",
+        "isAllowWorkshop",
+        "status",
+        "isPaidFor",
+        "city",
+        "state",
+        "country",
+      ],
     });
 
     if (!event) {
@@ -24,7 +50,12 @@ export async function GET(
       );
     }
 
-    return NextResponse.json({status: 200, data: event, message: "Event found", error: null});
+    return NextResponse.json({
+      status: 200,
+      data: event,
+      message: "Event found",
+      error: null,
+    });
   } catch (error) {
     console.error("Error fetching event:", error);
     return NextResponse.json(

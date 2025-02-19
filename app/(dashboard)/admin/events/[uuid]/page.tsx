@@ -1,35 +1,322 @@
 "use client";
 
-import { useState } from "react";
-import Link from "next/link";
+import { useState, useEffect } from "react";
+import { useRouter, useParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import {
+  ArrowRight,
+  Clock,
+  MapPin,
+  Download,
+  Mail,
+  AlertCircle,
+  Ticket,
+  Users,
+  BarChart2,
+} from "lucide-react";
+import useEventStore from "@/store/eventstore";
+import WorkshopCard from "@/components/custom/WorkshopCard";
+import { Skeleton } from "@/components/ui/skeleton";
+import AttendeeCardView from "@/components/custom/AttendeeCardView";
+
+// Sample sales data - replace with real data
+const salesData = [
+  { name: "Mon", sales: 2400 },
+  { name: "Tue", sales: 1398 },
+  { name: "Wed", sales: 9800 },
+  { name: "Thu", sales: 3908 },
+  { name: "Fri", sales: 4800 },
+  { name: "Sat", sales: 3800 },
+  { name: "Sun", sales: 4300 },
+];
+
+interface Ticket {
+  id: number;
+  type: string;
+  name: string;
+  price: number;
+  quantity: number;
+}
+
+interface WorkShop {
+  id: number;
+  uuid: string;
+  title: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+  isPaidFor: boolean;
+  ticket: Ticket[];
+}
+
+
 
 export default function EventDetailPage() {
-  const [events, setEvents] = useState([
-    { id: 1, title: "Next.js Conference", date: "2025-03-10" },
-    { id: 2, title: "React Summit", date: "2025-04-15" },
-  ]);
+  const router = useRouter();
+  const params = useParams();
+  const uuid = params?.uuid as string;
+  const [activeTab, setActiveTab] = useState("overview");
+  const { eventData, fetchEventbyUUID } = useEventStore();
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setIsLoading(true);
+      try {
+        await fetchEventbyUUID(uuid);
+      } catch (error) {
+        console.error("Error fetching event:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (uuid) {
+      fetchData();
+    }
+  }, [uuid, fetchEventbyUUID]);
+
+  const handleDownloadAttendees = () => {
+    // Implement CSV download logic
+    const csvContent =
+      "data:text/csv;charset=utf-8,Name,Email,Ticket Type,Purchase Date\n";
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "attendees.csv");
+    document.body.appendChild(link);
+    link.click();
+  };
+
+  const handleSendEmail = () => {
+    // Implement email sending logic
+    console.log("Sending email to attendees...");
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status.toLowerCase()) {
+      case "active":
+        return "bg-green-100 text-green-800";
+      case "sold out":
+        return "bg-red-100 text-red-800";
+      default:
+        return "bg-gray-100 text-gray-800";
+    }
+  };
+
+  const calculateProgress = (sold: number, total: number) => {
+    return (sold / total) * 100;
+  };
+
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <Card className="p-6">
+          <Skeleton className="h-8 w-1/3 mb-4" />
+          <Skeleton className="h-64 w-full mb-4" />
+          <Skeleton className="h-6 w-1/2 mb-2" />
+          <Skeleton className="h-6 w-1/4 mb-2" />
+        </Card>
+
+        <Card className="p-6">
+          <Skeleton className="h-8 w-1/3 mb-4" />
+          <div className="space-y-4">
+            {[...Array(2)].map((_, i) => (
+              <Skeleton key={i} className="h-24 w-full rounded-lg" />
+            ))}
+          </div>
+        </Card>
+      </div>
+    );
+  }
+
+  if (!eventData) {
+    return <div>Event not found</div>;
+  }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-6">
-      <h1 className="text-3xl font-bold mb-6">Welcome to My Next.js Page</h1>
+    <div className="space-y-8">
+      <div className="flex items-center justify-between">
+        <Button variant="ghost" onClick={() => router.push("/admin/events")}>
+          <ArrowRight className="w-4 h-4 mr-2 rotate-180" />
+          Back to Events
+        </Button>
+        <div className="flex gap-4">
+          <Button variant="outline">Edit Event</Button>
+          <Button variant="destructive">Cancel Event</Button>
+        </div>
+      </div>
 
-      <p className="text-gray-600 mb-4">Explore upcoming events below:</p>
-
-      {/* Events List */}
-      <ul className="space-y-4">
-        {events.map((event) => (
-          <li key={event.id} className="bg-gray-100 p-4 rounded-md w-80 text-center">
-            <h3 className="font-semibold">{event.title}</h3>
-            <p className="text-sm text-gray-500">{event.date}</p>
-          </li>
+      <div className="flex gap-4 border-b">
+        {["overview", "attendees"].map((tab) => (
+          <button
+            key={tab}
+            className={`px-4 py-2 font-medium ${
+              activeTab === tab
+                ? "border-b-2 border-blue-600 text-blue-600"
+                : "text-gray-500"
+            }`}
+            onClick={() => setActiveTab(tab)}
+          >
+            {tab.charAt(0).toUpperCase() + tab.slice(1)}
+          </button>
         ))}
-      </ul>
+      </div>
 
-      {/* Navigation Button */}
-      <Link href="/about">
-        <Button className="mt-6">Go to About Page</Button>
-      </Link>
+      {activeTab === "overview" && (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-2 space-y-6">
+            <Card className="p-6">
+              <img
+                src={eventData.eventImageUrl}
+                alt={eventData.title}
+                className="w-full h-64 object-cover rounded-lg mb-6"
+              />
+              <h2 className="text-2xl font-bold mb-4">{eventData.title}</h2>
+              <div className="grid grid-cols-2 gap-4 mb-6">
+                <div className="flex items-center text-gray-600">
+                  <Clock className="w-5 h-5 mr-2" />
+                  <div>
+                    <p className="font-medium">Date & Time</p>
+                    <p className="text-sm">
+                      {new Date(eventData.date).toLocaleDateString()}
+                    </p>
+                    <p className="text-sm">
+                      {new Date(eventData.startTime).toLocaleTimeString()} -{" "}
+                      {new Date(eventData.endTime).toLocaleTimeString()}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center text-gray-600">
+                  <MapPin className="w-5 h-5 mr-2" />
+                  <div>
+                    <p className="font-medium">Location</p>
+                    <p className="text-sm">{eventData.venue}</p>
+                    <p className="text-sm">{eventData.address}</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-6">
+                <h3 className="text-lg font-semibold mb-4">Event Overview</h3>
+                <p className="text-gray-600">{eventData.overview}</p>
+              </div>
+            </Card>
+            {eventData.workshops && eventData.workshops.length > 0 && (
+              <Card className="p-6">
+                <h3 className="text-lg font-semibold mb-4">
+                  List of Workshops
+                </h3>
+                <div className="space-y-4">
+                  {eventData.workshops.map((workshop: WorkShop) => (
+                    <WorkshopCard key={workshop.id} workshop={workshop} />
+                  ))}
+                </div>
+              </Card>
+            )}
+          </div>
+
+          <div className="space-y-6">
+            <Card className="p-6">
+              <h3 className="text-lg font-semibold mb-4">Event Stats</h3>
+              <div className="space-y-4">
+                <div className="flex justify-between items-center p-4 bg-gray-50 rounded-lg">
+                  <div className="flex items-center">
+                    <Ticket className="w-5 h-5 text-blue-600 mr-3" />
+                    <div>
+                      <p className="text-sm text-gray-500">Category</p>
+                      <p className="font-semibold">{eventData.category}</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex justify-between items-center p-4 bg-gray-50 rounded-lg">
+                  <div className="flex items-center">
+                    <Users className="w-5 h-5 text-blue-600 mr-3" />
+                    <div>
+                      <p className="text-sm text-gray-500">Event Type</p>
+                      <p className="font-semibold">{eventData.eventType}</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex justify-between items-center p-4 bg-gray-50 rounded-lg">
+                  <div className="flex items-center">
+                    <BarChart2 className="w-5 h-5 text-blue-600 mr-3" />
+                    <div>
+                      <p className="text-sm text-gray-500">Status</p>
+                      <Badge className={getStatusColor(eventData.status)}>
+                        {eventData.status}
+                      </Badge>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </Card>
+
+            <Card className="p-6">
+              <h3 className="text-lg font-semibold mb-4">Quick Actions</h3>
+              <div className="space-y-3">
+                <Button
+                  className="w-full"
+                  variant="outline"
+                  onClick={handleDownloadAttendees}
+                >
+                  <Download className="w-4 h-4 mr-2" />
+                  Download Attendee List
+                </Button>
+                <Button
+                  className="w-full"
+                  variant="outline"
+                  onClick={handleSendEmail}
+                >
+                  <Mail className="w-4 h-4 mr-2" />
+                  Send Email to Attendees
+                </Button>
+                <Button className="w-full" variant="outline">
+                  <AlertCircle className="w-4 h-4 mr-2" />
+                  View Check-in Status
+                </Button>
+              </div>
+            </Card>
+
+            {eventData.tickets && eventData.tickets.length > 0 && (
+              <Card className="p-6">
+                <h3 className="text-lg font-semibold mb-4">Ticket Types</h3>
+                <div className="space-y-4">
+                  {eventData.tickets.map((ticket: Ticket, index: number) => (
+                    <div key={index} className="p-4 border rounded-lg">
+                      <div className="flex justify-between items-start mb-2">
+                        <div>
+                          <h4 className="font-medium">{ticket.name}</h4>
+                          <p className="text-sm text-gray-500">
+                            Price: £{ticket.price}
+                          </p>
+                        </div>
+                        <Badge
+                          className={getStatusColor(
+                            ticket.quantity === 0 ? "Sold Out" : "Available"
+                          )}
+                        >
+                          {ticket.quantity === 0 ? "Sold Out" : "Available"}
+                        </Badge>
+                      </div>
+                      <div className="space-y-2">
+                        <div className="flex justify-between text-sm">
+                          <span>Available</span>
+                          <span>{ticket.quantity}</span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </Card>
+            )}
+          </div>
+        </div>
+      )}
+
+      {activeTab === "attendees" && <AttendeeCardView />}
     </div>
   );
 }
