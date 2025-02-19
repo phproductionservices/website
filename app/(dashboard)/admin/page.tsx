@@ -353,7 +353,10 @@ export default function AdminDashboard() {
               Back to Events
             </Button>
             <div className="flex gap-4">
+          
+            <Link href="admin/events/edit">
               <Button variant="outline">Edit Event</Button>
+              </Link>
               <Button variant="destructive">Cancel Event</Button>
             </div>
           </div>
