@@ -99,7 +99,7 @@ const useEventStore = create(
     },
 
     fetchEventbyUUID: async (uuid) => {
-      const result = await makeAuthenticatedRequest("get", `event/${uuid}`); 
+      const result = await makeAuthenticatedRequest("get", `event/${uuid}`);
       if (result && result.statusCode >= 200 && result.statusCode < 300) {
         set({ eventData: result.data });
         console.log("Fetched Event Data:", result.data);

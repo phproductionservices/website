@@ -122,8 +122,11 @@ export default function EventsPage() {
         // Render Events
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {events.map((event) => (
-            <div key={event.id} className="bg-white rounded-lg shadow overflow-hidden">
-              <img src={event.eventImageUrl} alt={event.title} className="w-full h-48 object-cover" />
+            
+              <div key={event.id} className="bg-white rounded-lg shadow overflow-hidden">
+                <Link href={`/admin/events/${event.uuid}`}>
+                  <img src={event.eventImageUrl} alt={event.title} className="w-full h-48 object-cover" />
+                </Link>
               <div className="p-4">
                 <div className="flex justify-between items-start">
                   <div>
@@ -147,6 +150,7 @@ export default function EventsPage() {
                 </div>
               </div>
             </div>
+            
           ))}
         </div>
       )}
