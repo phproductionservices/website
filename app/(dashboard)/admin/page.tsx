@@ -21,6 +21,7 @@ import {
   Users, 
   Ticket, 
   ArrowRight,
+  ArrowLeft,
   Download,
   Mail,
   BarChart2,
@@ -124,6 +125,27 @@ const events = [
   }
 ];
 
+// Mock workshop data with ticket types
+const workshops = [
+  {
+    id: 1,
+    name: "Workshop 1",
+    attendees: [
+      { name: "Alice Johnson", email: "alice@example.com", ticketType: "VIP", purchaseDate: "2024-03-01" },
+      { name: "Bob Smith", email: "bob@example.com", ticketType: "Early Bird", purchaseDate: "2024-03-02" },
+      { name: "Charlie Brown", email: "charlie@example.com", ticketType: "Regular", purchaseDate: "2024-03-03" }
+    ]
+  },
+  {
+    id: 2,
+    name: "Workshop 2",
+    attendees: [
+      { name: "David Wilson", email: "david@example.com", ticketType: "VIP", purchaseDate: "2024-03-04" },
+      { name: "Eve Adams", email: "eve@example.com", ticketType: "Early Bird", purchaseDate: "2024-03-05" }
+    ]
+  }
+];
+
 export default function AdminDashboard() {
   const [selectedEvent, setSelectedEvent] = useState<any>(null);
   const [searchQuery, setSearchQuery] = useState("");
@@ -133,6 +155,7 @@ export default function AdminDashboard() {
   const [attendeeSearchQuery, setAttendeeSearchQuery] = useState(""); 
   const [searchType, setSearchType] = useState("event");
   const [selectedTicketType, setSelectedTicketType] = useState("All");
+  const [selectedWorkshop, setSelectedWorkshop] = useState<any>(null); // Track selected workshop
   
   const filteredEvents = events.filter(event => {
     const matchesSearch = event.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -353,9 +376,8 @@ export default function AdminDashboard() {
               Back to Events
             </Button>
             <div className="flex gap-4">
-          
-            <Link href="admin/events/edit">
-              <Button variant="outline">Edit Event</Button>
+              <Link href="admin/events/edit">
+                <Button variant="outline">Edit Event</Button>
               </Link>
               <Button variant="destructive">Cancel Event</Button>
             </div>
@@ -537,84 +559,148 @@ export default function AdminDashboard() {
             </div>
           )}
 
-{activeTab === "attendees" && (
-  <Card className="p-6">
-    <div className="flex justify-between items-center mb-6">
-      <h3 className="text-lg font-semibold">Attendee List</h3>
-      <div className="flex gap-4">
-        <div className="flex-1 relative">
-          <Select value={searchType} onValueChange={setSearchType}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Search by" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="event">Event</SelectItem>
-              <SelectItem value="workshop">Workshop</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        <div className="flex-1 relative">
-          <Select value={selectedTicketType} onValueChange={setSelectedTicketType}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Ticket Type" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="All">All Ticket Types</SelectItem>
-              {selectedEvent.ticketTypes.map((ticket: any, index: number) => (
-                <SelectItem key={index} value={ticket.type}>{ticket.type}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-        <Button variant="outline" onClick={handleDownloadAttendees}>
-          <Download className="w-4 h-4 mr-2" />
-          Export CSV
-        </Button>
-      </div>
-    </div>
-    <div className="overflow-x-auto">
-      <table className="w-full">
-        <thead>
-          <tr className="border-b">
-            <th className="text-left p-4">Name</th>
-            <th className="text-left p-4">Email</th>
-            <th className="text-left p-4">Ticket Type</th>
-            <th className="text-left p-4">Purchase Date</th>
-            <th className="text-left p-4">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {selectedEvent?.recentAttendees
-            ?.filter((attendee: any) => {
-              // Apply both filters together
-              const matchesSearch =
-                attendee.name.toLowerCase().includes(attendeeSearchQuery.toLowerCase()) ||
-                attendee.email.toLowerCase().includes(attendeeSearchQuery.toLowerCase()) ||
-                attendee.ticketType.toLowerCase().includes(attendeeSearchQuery.toLowerCase());
-
-              const matchesTicketType =
-                selectedTicketType === "All" || attendee.ticketType === selectedTicketType;
-
-              return matchesSearch && matchesTicketType;
-            })
-            ?.map((attendee: any, index: number) => (
-              <tr key={index} className="border-b">
-                <td className="p-4">{attendee.name}</td>
-                <td className="p-4">{attendee.email}</td>
-                <td className="p-4">{attendee.ticketType}</td>
-                <td className="p-4">{attendee.purchaseDate}</td>
-                <td className="p-4">
-                  <Button variant="ghost" size="sm">
-                    <Mail className="w-4 h-4" />
+          {activeTab === "attendees" && (
+            <Card className="p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-lg font-semibold">Attendee List</h3>
+                <div className="flex gap-4">
+                  <div className="flex-1 relative">
+                    <Select value={searchType} onValueChange={setSearchType}>
+                      <SelectTrigger className="w-[180px]">
+                        <SelectValue placeholder="Search by" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="event">Event</SelectItem>
+                        <SelectItem value="workshop">Workshop</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="flex-1 relative">
+                    <Select value={selectedTicketType} onValueChange={setSelectedTicketType}>
+                      <SelectTrigger className="w-[180px]">
+                        <SelectValue placeholder="Ticket Type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="All">All Ticket Types</SelectItem>
+                        <SelectItem value="VIP">VIP</SelectItem>
+                        <SelectItem value="Early Bird">Early Bird</SelectItem>
+                        <SelectItem value="Regular">Regular</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <Button variant="outline" onClick={handleDownloadAttendees}>
+                    <Download className="w-4 h-4 mr-2" />
+                    Export CSV
                   </Button>
-                </td>
-              </tr>
-            ))}
-        </tbody>
-      </table>
-    </div>
-  </Card>
-)}
+                </div>
+              </div>
+              <div className="overflow-x-auto">
+                {searchType === "workshop" ? (
+                  <>
+                    {!selectedWorkshop ? (
+                      <div className="space-y-4">
+                        <h4 className="text-lg font-medium">Workshops</h4>
+                        {workshops.map((workshop) => (
+                          <Card
+                            key={workshop.id}
+                            className="p-4 cursor-pointer hover:bg-gray-50"
+                            onClick={() => setSelectedWorkshop(workshop)}
+                          >
+                            <h5 className="font-medium">{workshop.name}</h5>
+                            <p className="text-sm text-gray-500">{workshop.attendees.length} attendees</p>
+                          </Card>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="space-y-4">
+                        <Button
+                          variant="ghost"
+                          onClick={() => setSelectedWorkshop(null)}
+                          className="mb-4"
+                        >
+                          <ArrowLeft className="w-4 h-4 mr-2" />
+                          Back to Workshops
+                        </Button>
+                        <h4 className="text-lg font-medium">Attendees for {selectedWorkshop.name}</h4>
+                        <table className="w-full">
+                          <thead>
+                            <tr className="border-b">
+                              <th className="text-left p-4">Name</th>
+                              <th className="text-left p-4">Email</th>
+                              <th className="text-left p-4">Ticket Type</th>
+                              <th className="text-left p-4">Purchase Date</th>
+                              <th className="text-left p-4">Actions</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {selectedWorkshop.attendees
+                              .filter((attendee: any) => {
+                                if (selectedTicketType === "All") {
+                                  return true;
+                                }
+                                return attendee.ticketType === selectedTicketType;
+                              })
+                              .map((attendee: any, index: number) => (
+                                <tr key={index} className="border-b">
+                                  <td className="p-4">{attendee.name}</td>
+                                  <td className="p-4">{attendee.email}</td>
+                                  <td className="p-4">{attendee.ticketType}</td>
+                                  <td className="p-4">{attendee.purchaseDate}</td>
+                                  <td className="p-4">
+                                    <Button variant="ghost" size="sm">
+                                      <Mail className="w-4 h-4" />
+                                    </Button>
+                                  </td>
+                                </tr>
+                              ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <table className="w-full">
+                    <thead>
+                      <tr className="border-b">
+                        <th className="text-left p-4">Name</th>
+                        <th className="text-left p-4">Email</th>
+                        <th className="text-left p-4">Ticket Type</th>
+                        <th className="text-left p-4">Purchase Date</th>
+                        <th className="text-left p-4">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {selectedEvent?.recentAttendees
+                        ?.filter((attendee: any) => {
+                          const matchesSearch =
+                            attendee.name.toLowerCase().includes(attendeeSearchQuery.toLowerCase()) ||
+                            attendee.email.toLowerCase().includes(attendeeSearchQuery.toLowerCase()) ||
+                            attendee.ticketType.toLowerCase().includes(attendeeSearchQuery.toLowerCase());
+
+                          const matchesTicketType =
+                            selectedTicketType === "All" || attendee.ticketType === selectedTicketType;
+
+                          return matchesSearch && matchesTicketType;
+                        })
+                        ?.map((attendee: any, index: number) => (
+                          <tr key={index} className="border-b">
+                            <td className="p-4">{attendee.name}</td>
+                            <td className="p-4">{attendee.email}</td>
+                            <td className="p-4">{attendee.ticketType}</td>
+                            <td className="p-4">{attendee.purchaseDate}</td>
+                            <td className="p-4">
+                              <Button variant="ghost" size="sm">
+                                <Mail className="w-4 h-4" />
+                              </Button>
+                            </td>
+                          </tr>
+                        ))}
+                    </tbody>
+                  </table>
+                )}
+              </div>
+            </Card>
+          )}
         </div>
       )}
     </div>
