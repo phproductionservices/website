@@ -14,6 +14,7 @@ export default function AddWorkshopPage() {
   const uuid = params?.uuid as string;
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+  const { addedevents } = useEventStore();
 
   // State to control whether the WorkshopDrawer is open
   const [isAddingWorkshop, setIsAddingWorkshop] = useState(false);
@@ -42,7 +43,7 @@ export default function AddWorkshopPage() {
         uuid,
       });
 
-      if (response.statusCode === 201) {
+      if (response && response.statusCode >= 200 && response.statusCode < 300) {
         // Show success toast
         toast({
           title: "Event details created successfully",
@@ -51,8 +52,8 @@ export default function AddWorkshopPage() {
 
         // Wait for 3 seconds before redirecting
         setTimeout(() => {
-          router.push(`/admin/events/create/${response.uuid}/tickets`);
-        }, 2000);
+          router.push(`/admin/events/create/${response.uuid}/success`);
+        }, 1000);
       }
     } catch (error) {
       console.error("Error submitting workshops:", error);

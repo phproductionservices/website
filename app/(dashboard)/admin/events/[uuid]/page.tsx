@@ -20,6 +20,7 @@ import useEventStore from "@/store/eventstore";
 import WorkshopCard from "@/components/custom/WorkshopCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import AttendeeCardView from "@/components/custom/AttendeeCardView";
+import Link from "next/link";
 
 // Sample sales data - replace with real data
 const salesData = [
@@ -32,12 +33,27 @@ const salesData = [
   { name: "Sun", sales: 4300 },
 ];
 
+interface Registration{
+  id : number;
+  uuid: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  quantity: number;
+  pricePerTicket: number;
+  ticketRef: string;
+  type: string;
+  amount: number;
+}
+
 interface Ticket {
   id: number;
   type: string;
   name: string;
   price: number;
   quantity: number;
+  registrations: Registration[];
 }
 
 interface WorkShop {
@@ -51,14 +67,12 @@ interface WorkShop {
   ticket: Ticket[];
 }
 
-
-
 export default function EventDetailPage() {
   const router = useRouter();
   const params = useParams();
   const uuid = params?.uuid as string;
   const [activeTab, setActiveTab] = useState("overview");
-  const { eventData, fetchEventbyUUID } = useEventStore();
+  const { eventData, fetchEventbyUUID, setEventData } = useEventStore();
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -88,6 +102,11 @@ export default function EventDetailPage() {
     link.setAttribute("download", "attendees.csv");
     document.body.appendChild(link);
     link.click();
+  };
+
+  const handleTicketNav = async () => {
+    await setEventData(eventData);
+    router.push(`/admin/events/create/${uuid}/tickets`);
   };
 
   const handleSendEmail = () => {
@@ -144,7 +163,9 @@ export default function EventDetailPage() {
           Back to Events
         </Button>
         <div className="flex gap-4">
-          <Button variant="outline">Edit Event</Button>
+          <Link href={`/admin/events/${eventData.uuid}/edit`}>
+            <Button variant="outline">Edit Event</Button>
+          </Link>
           <Button variant="destructive">Cancel Event</Button>
         </div>
       </div>
@@ -280,7 +301,7 @@ export default function EventDetailPage() {
               </div>
             </Card>
 
-            {eventData.tickets && eventData.tickets.length > 0 && (
+            {eventData.tickets && eventData.tickets.length > 0 ? (
               <Card className="p-6">
                 <h3 className="text-lg font-semibold mb-4">Ticket Types</h3>
                 <div className="space-y-4">
@@ -311,12 +332,28 @@ export default function EventDetailPage() {
                   ))}
                 </div>
               </Card>
+            ) : (
+              <Card className="p-6">
+                <h3 className="text-lg font-semibold mb-4">
+                  No tickets available
+                </h3>
+
+                <div className="space-y-3">
+                  <Button
+                    className="w-full"
+                    variant="outline"
+                    onClick={handleTicketNav}
+                  >
+                    Create Ticket
+                  </Button>
+                </div>
+              </Card>
             )}
           </div>
         </div>
       )}
 
-      {activeTab === "attendees" && <AttendeeCardView />}
+      {activeTab === "attendees" && <AttendeeCardView eventData= {eventData}/>}
     </div>
   );
 }

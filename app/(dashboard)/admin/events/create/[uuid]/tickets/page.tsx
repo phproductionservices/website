@@ -11,8 +11,8 @@ import { useToast } from "@/hooks/use-toast";
 
 export default function AddTicketPage() {
   const router = useRouter();
-  const params = useParams(); // Extract params object
-  const uuid = params?.uuid as string; // Ensure uuid is correctly retrieved
+  const params = useParams();
+  const uuid = params?.uuid as string;
   const { toast } = useToast()
 
   // State for multiple tickets
@@ -32,7 +32,7 @@ export default function AddTicketPage() {
       if (!ticket.name.trim()) {
         ticketErrors.name = "Ticket name is required.";
       }
-      if (!ticket.price || parseFloat(ticket.price) <= 0) {
+      if (!ticket.price || parseFloat(ticket.price) < 0) {
         ticketErrors.price = "Price must be a positive number.";
       }
       if (!ticket.quantity || parseInt(ticket.quantity) <= 0) {
@@ -71,14 +71,14 @@ export default function AddTicketPage() {
   };
 
   // Proceed to next step
-  const handleNext = () => {
+  const handleNext = async () => {
     if (!validateForm()) {
       toast({description:"Please fix the errors before proceeding."});
       return;
     }
     console.log("form data : ", tickets);
 
-    const response = useEventStore.getState().createTicket({
+    const response = await useEventStore.getState().createTicket({
       tickets,
       uuid
     })
@@ -86,14 +86,14 @@ export default function AddTicketPage() {
       // Show success toast
       toast({
         title: "Event details created successfully",
-        description: "Event details saved successfully! Redirecting...",
+        description: response.message,
       });
 
       // Wait for 3 seconds before redirecting
       setTimeout(() => {
-        router.push(`/admin/events/create/${response.uuid}/tickets`);
+        router.push(`/admin/events/create/${response.uuid}/workshops`);
 
-      }, 2000);
+      }, 1000);
     }
     // router.push(`/admin/events/create/${uuid}/workshops`);
   };

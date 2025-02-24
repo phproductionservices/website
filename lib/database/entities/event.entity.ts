@@ -69,8 +69,8 @@ export class Event extends BaseEntity {
   @JoinColumn()
   registeredusers!: UserRegistration;
 
-  @OneToMany(() => Registration, registration => registration.event)
-  registrations!: Registration[];
+  // @OneToMany(() => Registration, registration => registration.event)
+  // registrations!: Registration[];
 
   @OneToMany(() => Ticket, (ticket) => ticket.event, { nullable: true })
   tickets?: Ticket[];

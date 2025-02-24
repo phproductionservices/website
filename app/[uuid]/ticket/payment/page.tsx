@@ -7,13 +7,18 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import Image from "next/image";
 import Link from "next/link";
+import { useParams, useRouter } from "next/navigation";
 
 export default function PaymentPage() {
+  const router = useRouter();
+  const params = useParams();
+  const uuid = params?.uuid as string;
   return (
     <div className="grid md:grid-cols-3 gap-8">
       <div className="md:col-span-2">
         <div className="bg-gray-50 p-4 rounded-lg mb-8">
-          We've reserved your ticket. Please complete checkout within 06:48 to secure your tickets.
+          We've reserved your ticket. Please complete checkout within 06:48 to
+          secure your tickets.
         </div>
 
         <h2 className="text-2xl font-bold mb-8">Payment Options</h2>
@@ -50,7 +55,11 @@ export default function PaymentPage() {
         <div className="mt-8 space-y-6">
           <div>
             <Label htmlFor="cardNumber">Card number</Label>
-            <Input id="cardNumber" placeholder="0000 - 0000 - 0000 - 0000" className="mt-1" />
+            <Input
+              id="cardNumber"
+              placeholder="0000 - 0000 - 0000 - 0000"
+              className="mt-1"
+            />
           </div>
 
           <div className="grid grid-cols-3 gap-4">
@@ -90,12 +99,14 @@ export default function PaymentPage() {
               <span>Subtotal</span>
               <span>£12.56</span>
             </div>
-            <button className="text-blue-600 text-sm mb-4">Add discount code</button>
+            <button className="text-blue-600 text-sm mb-4">
+              Add discount code
+            </button>
             <div className="flex justify-between mb-6">
               <span className="font-semibold">Total</span>
               <span className="font-semibold">£13.56</span>
             </div>
-            <Link href="/ticket/get-ticket">
+            <Link href={`/${uuid}/ticket/get-ticket`}>
               <Button className="w-full">Get Tickets</Button>
             </Link>
           </div>

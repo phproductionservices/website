@@ -33,7 +33,7 @@ export async function POST(request: Request) {
 
     if (!Array.isArray(tickets) || tickets.length === 0) {
       return NextResponse.json(
-        { message: "Tickets array is required", status: 400, error: true },
+        { message: "Tickets is required", status: 400, error: true },
         { status: 400 }
       );
     }
@@ -65,7 +65,7 @@ export async function POST(request: Request) {
       }
 
       // Validate price and quantity
-      if (price <= 0) {
+      if (price < 0) {
         errors.push({ message: `Invalid price for ticket: ${price}`, ticketData });
         continue;
       }
@@ -89,6 +89,11 @@ export async function POST(request: Request) {
       createdTickets.push(ticket);
     }
 
+    return NextResponse.json(
+      { message: "Tickets created successfully", data: createdTickets, status: 201 },
+      { status: 201 }
+    );
+
     if (errors.length > 0) {
       return NextResponse.json(
         { message: "Some tickets could not be created", createdTickets, errors, status: 207 }, // 207: Multi-Status
@@ -96,10 +101,7 @@ export async function POST(request: Request) {
       );
     }
 
-    return NextResponse.json(
-      { message: "Tickets created successfully", data: createdTickets, status: 201 },
-      { status: 201 }
-    );
+    
   } catch (error) {
     console.error("Error creating tickets:", error);
     return NextResponse.json(
