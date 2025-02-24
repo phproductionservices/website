@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { initializeDB } from "@/lib/database/db";
 import { Event } from "@/lib/database/entities/event.entity";
+import { createSlug } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -16,7 +17,7 @@ export async function GET(
     // ✅ Select only the fields you need
     const event = await eventRepo.findOne({
       where: { uuid: params.uuid },
-      relations: ["workshops", "workshops.ticket", "tickets"],
+      relations: ["workshops", "workshops.ticket", "workshops.ticket.registrations", "tickets", "tickets.registrations"],
       select: [
         "id",
         "uuid",
@@ -75,50 +76,97 @@ export async function PUT(
       overview, 
       category, 
       eventType, 
+      date, 
       startTime, 
       endTime, 
       venue, 
       address, 
-      eventImageUrl 
+      eventImageUrl, 
+      city,   
+      state,  
+      country,
+      postcode,
+      isAllowWorkshop,
+      isPaidFor
     } = await request.json();
-    
+
     const db = await initializeDB();
     const eventRepo = db.getRepository(Event);
 
+    // Find event by UUID
     const event = await eventRepo.findOne({
       where: { uuid: params.uuid }
     });
 
     if (!event) {
       return NextResponse.json(
-        { error: "Event not found" },
+        { message: "Event not found", error: true, status: 404 },
         { status: 404 }
       );
     }
 
+    // Check for duplicate slug (if title is changing)
+    const newSlug = createSlug(title);
+    if (event.title !== title) {
+      const existingEvent = await eventRepo.findOne({ where: { slug: newSlug } });
+      if (existingEvent) {
+        return NextResponse.json(
+          { message: "Another event exists with a similar name", error: true, status: 400 },
+          { status: 400 }
+        );
+      }
+    }
+
+    // Validate date and times
+    if (!date || !startTime || !endTime) {
+      return NextResponse.json(
+        { message: "Invalid date or time format", error: true, status: 400 },
+        { status: 400 }
+      );
+    }
+
+    const fullStartTime = new Date(`${date}T${startTime}:00`);
+    const fullEndTime = new Date(`${date}T${endTime}:00`);
+
+    // Update only the event fields (excluding workshops & tickets)
     Object.assign(event, {
       title,
+      slug: newSlug, // Update slug if title changes
       overview,
       category,
       eventType,
-      startTime: new Date(startTime),
-      endTime: new Date(endTime),
+      date: new Date(date),
+      startTime: fullStartTime,
+      endTime: fullEndTime,
       venue,
       address,
-      eventImageUrl
+      eventImageUrl,
+      city,   
+      state,  
+      country, 
+      postcode,
+      isAllowWorkshop: isAllowWorkshop ?? false,
+      isPaidFor: isPaidFor ?? false,
     });
 
     await eventRepo.save(event);
 
-    return NextResponse.json(event);
+    return NextResponse.json({
+      message: "Event updated successfully",
+      data: event,
+      status: 200,
+      error: false
+    });
+
   } catch (error) {
     console.error("Error updating event:", error);
     return NextResponse.json(
-      { error: "Failed to update event" },
+      { message: "Failed to update event", error: true, status: 500 },
       { status: 500 }
     );
   }
 }
+
 
 export async function DELETE(
   request: Request,

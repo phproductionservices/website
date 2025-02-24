@@ -31,8 +31,8 @@ export class Workshop extends BaseEntity {
   @JoinColumn()
   ticket!: any[];
 
-  @OneToMany(() => Registration, (registration) => registration.workshop)
-  registrations!: Registration[];
+  // @OneToMany(() => Registration, (registration) => registration.workshop)
+  // registrations!: Registration[];
 
   @OneToMany(() => Speaker, (speaker) => speaker.workshop)
   speakers!: Speaker[];

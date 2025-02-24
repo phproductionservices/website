@@ -16,7 +16,7 @@ export async function GET() {
 
     // Fetch events and include related entities (workshops, registrations, tickets)
     const events = await eventRepo.find({
-      relations: ["workshops", "registrations", "tickets"],
+      relations: ["workshops", "tickets"],
       order: { created_at: "DESC" },
     });
 
@@ -24,7 +24,6 @@ export async function GET() {
     const eventsWithRelations = events.map(event => ({
       ...event,
       workshops: event.workshops ?? [],
-      registrations: event.registrations ?? [],
       tickets: event.tickets ?? [],
     }));
 
@@ -93,8 +92,7 @@ export async function POST(request: Request) {
       postcode,
       isAllowWorkshop: isAllowWorkshop ?? false,
       isPaidFor: isPaidFor ?? false,
-      workshops: [],       
-      registrations: [],
+      workshops: [],     
       tickets: []
     });
 

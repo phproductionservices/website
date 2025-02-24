@@ -41,9 +41,28 @@ const useEventStore = create(
     eventData: {},
     addedWorkshop: {},
     addedTickes: [],
+    addedRegistration: [],
+    ticketData: null,
     setRehydrationComplete: (status) => set({ rehydrationComplete: status }),
+
+    setEventData: (data) => set({ addedevents: data }),
+
+    saveticketData: (data) => {
+      set({ ticketData: data });
+    },
     
     createEvent: async (eventData) => {
+      const result = await makeAuthenticatedRequest("post", "event", eventData);
+      if (result && result.status >= 200 && result.status < 300) {
+        set({
+          addedevents: result.data,
+        });
+        console.log("Event created successfully:", result.data);
+      }
+      return result;
+    },
+
+    editEvent: async (eventData) => {
       const result = await makeAuthenticatedRequest("post", "event", eventData);
       if (result && result.status >= 200 && result.status < 300) {
         set({
@@ -65,9 +84,20 @@ const useEventStore = create(
       return result;
     }, 
 
+    createTicketRegistration: async (registerData) => {
+      const result = await makeAuthenticatedRequest("post", "registration", registerData);
+      if (result && result.statusCode >= 200 && result.statusCode < 300) {
+        set({
+          addedRegistration: result.data
+        });
+      }
+      return result;
+    }, 
+
     createTicket: async (tickData) => {
       console.log("Data : ", tickData);
       const result = await makeAuthenticatedRequest("post", "ticket", tickData);
+      console.log('Response : ', result);
       if (result && result.statusCode >= 200 && result.statusCode < 300) {
         set({
           addedTickes: result.data

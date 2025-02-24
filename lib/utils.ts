@@ -37,6 +37,14 @@ export const createSlug = (text: string) => {
     .replace(/-+$/, "");
 };
 
+export const createTicketReference = (firstName: string, ticketNumber: number) => {
+  const year = new Date().getFullYear(); // Get current year
+  const formattedNumber = String(ticketNumber).padStart(3, "0"); // Ensure 3-digit format
+  const namePart = firstName.trim().toUpperCase().slice(0, 3); // First 3 letters of first name
+
+  return `TKT-${year}-${namePart}-${formattedNumber}`;
+};
+
 export function handleAxiosError(error: {
   response: { status: any; data: { message: any } };
   request: any;
