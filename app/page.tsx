@@ -664,7 +664,7 @@ export default function Home() {
             <div>
               <div className="flex items-center space-x-2 mb-6">
                 <Zap className="w-8 h-8 text-blue-600" />
-                <span className="font-bold text-xl">PH Productions</span>
+                <span className="font-bold text-xl">PH Production Services Ltd</span>
               </div>
               <div className="space-y-4">
                 <div className="flex items-center">
@@ -673,11 +673,11 @@ export default function Home() {
                 </div>
                 <div className="flex items-center">
                   <Mail className="w-5 h-5 mr-2 text-blue-600" />
-                  <p>info@phproductionservices.co.uk</p>
+                  <p>office@phproductionservices.co.uk</p>
                 </div>
                 <div className="flex items-center">
                   <MapPinned className="w-5 h-5 mr-2 text-blue-600" />
-                  <p>Stoke-on-Trent, UK</p>
+                  <p>Newcastle-under-Lyme, Newcastle ST5 1EJ, UK</p>
                 </div>
               </div>
             </div>
