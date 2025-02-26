@@ -66,7 +66,7 @@ const events = [
     totalTickets: 500,
     revenue: "£43,750",
     status: "Active",
-    image: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&h=500&fit=crop",
+    //image: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&h=500&fit=crop",
     attendees: "500+",
     ticketTypes: [
       { type: "Early Bird", sold: 100, total: 100, price: "£99" },
@@ -96,7 +96,7 @@ const events = [
     totalTickets: 2000,
     revenue: "£75,000",
     status: "Upcoming",
-    image: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800&h=500&fit=crop",
+  //  image: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800&h=500&fit=crop",
     attendees: "2000+",
     ticketTypes: [
       { type: "General Admission", sold: 1000, total: 1500, price: "£49" },
@@ -115,7 +115,7 @@ const events = [
     totalTickets: 300,
     revenue: "£84,000",
     status: "Almost Sold Out",
-    image: "https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=800&h=500&fit=crop",
+    //image: "https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=800&h=500&fit=crop",
     attendees: "300",
     ticketTypes: [
       { type: "Professional", sold: 200, total: 200, price: "£299" },
@@ -309,18 +309,49 @@ export default function AdminDashboard() {
                 {filteredEvents.map((event) => (
                   <TableRow key={event.id} className="cursor-pointer hover:bg-gray-50" onClick={() => setSelectedEvent(event)}>
                     <TableCell>
-                      <div className="flex items-center gap-3">
-                        <img 
-                          src={event.image} 
-                          alt={event.title}
-                          className="w-12 h-12 rounded-lg object-cover"
-                        />
-                        <div>
-                          <div className="font-medium">{event.title}</div>
-                          <div className="text-sm text-gray-500">{event.category}</div>
-                        </div>
-                      </div>
-                    </TableCell>
+  <div className="flex items-center gap-3">
+    <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
+    <div className="relative w-12 h-12">
+  <svg className="w-full h-full transform -rotate-90">
+    <circle
+      cx="24"
+      cy="24"
+      r="20"
+      className="text-gray-200"
+      strokeWidth="4"
+      stroke="currentColor"
+      fill="transparent"
+    />
+    <circle
+      cx="24"
+      cy="24"
+      r="20"
+      className="text-blue-600"
+      strokeWidth="4"
+      strokeDasharray={125.66} // 2 * π * r (2 * 3.1416 * 20)
+      strokeDashoffset={125.66 * (1 - (calculateProgress(event.ticketsSold, event.totalTickets) / 100))}
+      strokeLinecap="round"
+      stroke="currentColor"
+      fill="transparent"
+      style={{ transition: 'stroke-dashoffset 0.5s ease-out' }}
+    />
+  </svg>
+  <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
+    <span className="text-[0.75rem] font-bold text-blue-600">
+      {Math.round(calculateProgress(event.ticketsSold, event.totalTickets))}%
+    </span>
+    <span className="block text-[0.6rem] font-medium text-blue-400 uppercase mt-[-2px]">
+      SOLD
+    </span>
+  </div>
+</div>
+    </div>
+    <div>
+      <div className="font-medium">{event.title}</div>
+      <div className="text-sm text-gray-500">{event.category}</div>
+    </div>
+  </div>
+</TableCell>
                     <TableCell>
                       <div className="text-sm">
                         <div>{event.date}</div>
