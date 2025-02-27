@@ -74,12 +74,18 @@ export default function EventDetailPage() {
   const [activeTab, setActiveTab] = useState("overview");
   const { eventData, fetchEventbyUUID, setEventData } = useEventStore();
   const [isLoading, setIsLoading] = useState(true);
+  const [totalAmount, setTotalAmount] = useState(0);
+  const [totalquantity, setTotalCapicity] = useState(0);
+  const [totalsold, setTotalsold] = useState(0);
 
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
       try {
-        await fetchEventbyUUID(uuid);
+        const data = await fetchEventbyUUID(uuid);
+        setTotalsold(data.totalsold);
+        setTotalCapicity(data.totalquantity);
+        setTotalAmount(data.totalamount);
       } catch (error) {
         console.error("Error fetching event:", error);
       } finally {
@@ -247,8 +253,8 @@ export default function EventDetailPage() {
                   <div className="flex items-center">
                     <Ticket className="w-5 h-5 text-blue-600 mr-3" />
                     <div>
-                      <p className="text-sm text-gray-500">Category</p>
-                      <p className="font-semibold">{eventData.category}</p>
+                      <p className="text-sm text-gray-500">Total Sales</p>
+                      <p className="font-semibold">£{totalAmount}</p>
                     </div>
                   </div>
                 </div>
@@ -256,8 +262,8 @@ export default function EventDetailPage() {
                   <div className="flex items-center">
                     <Users className="w-5 h-5 text-blue-600 mr-3" />
                     <div>
-                      <p className="text-sm text-gray-500">Event Type</p>
-                      <p className="font-semibold">{eventData.eventType}</p>
+                      <p className="text-sm text-gray-500">Attendance</p>
+                      <p className="font-semibold">{totalsold}/{totalquantity}</p>
                     </div>
                   </div>
                 </div>

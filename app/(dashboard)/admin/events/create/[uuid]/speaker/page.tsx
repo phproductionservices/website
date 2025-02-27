@@ -1,3 +1,5 @@
+"use client";
+
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -8,11 +10,12 @@ import {
 } from "next-cloudinary";
 import { useParams, useRouter } from "next/navigation";
 import useEventStore from "@/store/eventstore";
+import { useToast } from "@/hooks/use-toast";
 
 interface Speaker {
   name: string;
   description: string;
-  imageUrl?: string;
+  speakerUrl?: string;
 }
 
 interface FormErrors {
@@ -23,7 +26,8 @@ export default function AddSpeaker() {
   const router = useRouter();
   const params = useParams();
   const uuid = params?.uuid as string;
-  const { addedevents } = useEventStore();
+  const { eventData, fetchEventbyUUID } = useEventStore();
+  const { toast } = useToast();
   const [formData, setFormData] = useState<{ speakers: Speaker[] }>({
     speakers: [],
   });
@@ -46,7 +50,7 @@ export default function AddSpeaker() {
       ...formData,
       speakers: [
         ...formData.speakers,
-        { name: "", description: "", imageUrl: "" },
+        { name: "", description: "", speakerUrl: "" },
       ],
     });
   };
@@ -58,38 +62,70 @@ export default function AddSpeaker() {
 
   const validateForm = () => {
     let newErrors: FormErrors = {};
+    let isValid = true;
+
     formData.speakers.forEach((speaker, index) => {
       const key = `speaker-${index}`;
-      newErrors[key] = [];
-      if (!speaker.name) {
-        newErrors[key].push("Speaker name is required");
+      let speakerErrors: string[] = [];
+
+      if (!speaker.name.trim()) {
+        speakerErrors.push("Speaker name is required");
+        isValid = false;
       }
-      if (!speaker.description) {
-        newErrors[key].push("Speaker description is required");
+
+      if (!speaker.description.trim()) {
+        speakerErrors.push("Speaker description is required");
+        isValid = false;
+      }
+
+      if (speakerErrors.length > 0) {
+        newErrors[key] = speakerErrors;
       }
     });
+
     setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    return isValid; // ✅ Now returns false if any errors exist
   };
 
-  const handleSubmit = () => {
-    if (validateForm()) {
-      setIsLoading(true);
+  const handleSubmit = async () => {
+    if (!validateForm()) return;
+
+    setIsLoading(true);
+    const response = await useEventStore.getState().createEventSpeaker({
+      formData,
+      uuid,
+    });
+    const dataresonse = await fetchEventbyUUID(uuid);
+
+    if (response.statusCode >= 200 && response.statusCode < 300) {
+      toast({
+        title: "Event details created successfully",
+        description: response.message,
+      });
+
+      setIsLoading(false);
       setTimeout(() => {
-        console.log("Submitted Data:", formData);
-        setIsLoading(false);
-      }, 2000);
+        console.log(dataresonse.data.isPaidFor);
+        if (dataresonse.data.isPaidFor === false) {
+          router.push(`/admin/events/create/${uuid}/workshops`);
+        } else {
+          router.push(`/admin/events/create/${uuid}/tickets`);
+        }
+      }, 1000);
     }
+
   };
 
-  const onNext = () => {
-    if(addedevents.isPaidFor == false){
-        router.push(`/admin/events/create/${uuid}/workshops`);
+  const onNext = async () => {
+    const dataresonse = await fetchEventbyUUID(uuid);
+    
+    console.log(eventData.isPaidFor);
+    if (dataresonse.data.isPaidFor === false) {
+      router.push(`/admin/events/create/${uuid}/workshops`);
+    } else {
+      router.push(`/admin/events/create/${uuid}/tickets`);
     }
-    else{
-        router.push(`/admin/events/create/${uuid}/tickets`);
-    }  
-  }
+  };
 
   return (
     <div className="space-y-6">
@@ -143,7 +179,7 @@ export default function AddSpeaker() {
                   "secure_url" in cloudinaryResults.info
                 ) {
                   const secureUrl = cloudinaryResults.info.secure_url;
-                  handleSpeakerChange(index, "imageUrl", secureUrl);
+                  handleSpeakerChange(index, "speakerUrl", secureUrl);
                   console.log("✅ Image Uploaded:", secureUrl);
                 } else {
                   console.error(
@@ -166,9 +202,9 @@ export default function AddSpeaker() {
                 >
                   Upload Speaker Image
                 </Button>
-                {speaker.imageUrl && (
+                {speaker.speakerUrl && (
                   <span className="text-sm text-gray-500 break-all">
-                    {speaker.imageUrl}
+                    {speaker.speakerUrl}
                   </span>
                 )}
               </div>
@@ -182,7 +218,7 @@ export default function AddSpeaker() {
         <Button
           onClick={handleSubmit}
           className="bg-blue-500 text-white"
-          disabled={isLoading}
+          disabled={isLoading || formData.speakers.length === 0} // ✅ Disabled when no speakers
         >
           {isLoading ? (
             <div className="flex items-center justify-center">
@@ -192,7 +228,7 @@ export default function AddSpeaker() {
             <span className="flex items-center justify-center">Submit</span>
           )}
         </Button>
-        <Button onClick={onNext} className="bg-gray-400 text-white">
+        <Button onClick={onNext} className=" text-white">
           Skip
         </Button>
       </div>

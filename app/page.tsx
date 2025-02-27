@@ -129,8 +129,8 @@ export default function Home() {
       try {
         const response = await fetchEventAll();
         if (response.statusCode === 200) {
-          setEvents(response.data);
-          console.log("Number of events: ", response.data);
+          setEvents(response.data.events);
+          console.log("Number of events: ", response.data.events);
         }
       } catch (error) {
         console.error("Error fetching events: ", error);
@@ -289,7 +289,7 @@ export default function Home() {
           {/* Main background image */}
           <div className="absolute inset-0 z-10">
             <img
-              src="https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&q=80&w=2070"
+              src="https://res.cloudinary.com/deetnosec/image/upload/v1740666498/250216_-_Honey_Box_Live_-_0804_-_045_uukb0r.jpg"
               alt="Event production"
               className="w-full h-full object-cover"
             />
@@ -306,8 +306,10 @@ export default function Home() {
             className="absolute top-1/4 right-20 z-30 hidden lg:block"
           >
             <img
-              src="https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&q=80&w=400&h=300"
+              src="https://res.cloudinary.com/deetnosec/image/upload/v1740666612/IMG_3322_l6uswc.jpg"
               alt="Event"
+              height={500}
+              width={500}
               className="rounded-lg shadow-2xl transform -rotate-6"
             />
           </motion.div>
@@ -319,8 +321,10 @@ export default function Home() {
             className="absolute bottom-1/4 right-40 z-30 hidden lg:block"
           >
             <img
-              src="https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?auto=format&fit=crop&q=80&w=400&h=300"
+              src="https://res.cloudinary.com/deetnosec/image/upload/v1740666749/IMG_7634-Enhanced-NR_dxrnlm.jpg"
               alt="Event"
+              height={500}
+              width={500}
               className="rounded-lg shadow-2xl transform rotate-6"
             />
           </motion.div>
@@ -435,14 +439,16 @@ export default function Home() {
             <motion.div variants={fadeInUp} className="relative">
               <div className="relative z-10">
                 <img
-                  src="https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&q=80&w=600&h=800"
+                  src="https://res.cloudinary.com/deetnosec/image/upload/v1740666932/250216_-_Honey_Box_Live_-_0804_-_045_1_phavsq.jpg?auto=format&fit=crop&q=80&w=600&h=800"
                   alt="Event production team"
                   className="rounded-lg shadow-2xl"
                 />
               </div>
               <div className="absolute -bottom-8 -right-8 z-20">
                 <img
-                  src="https://images.unsplash.com/photo-1475721027785-f74eccf877e2?auto=format&fit=crop&q=80&w=400&h=300"
+                  src="https://res.cloudinary.com/deetnosec/image/upload/v1740667078/IMG_3622_bchh4f.jpg"
+                  height={300}
+                  width={450}
                   alt="Event setup"
                   className="rounded-lg shadow-2xl"
                 />

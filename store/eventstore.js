@@ -42,6 +42,7 @@ const useEventStore = create(
     addedWorkshop: {},
     addedTickes: [],
     addedRegistration: [],
+    addedSpeaker: [],
     ticketData: null,
     setRehydrationComplete: (status) => set({ rehydrationComplete: status }),
 
@@ -94,6 +95,18 @@ const useEventStore = create(
       return result;
     }, 
 
+    createEventSpeaker: async (data) => {
+      console.log(data);
+      const result = await makeAuthenticatedRequest("post", "event-speaker", data);
+      console.log('Response : ', result);
+      if (result && result.statusCode >= 200 && result.statusCode < 300) {
+        set({
+          addedSpeaker: result.data
+        });
+      }
+      return result;
+    }, 
+
     createTicket: async (tickData) => {
       console.log("Data : ", tickData);
       const result = await makeAuthenticatedRequest("post", "ticket", tickData);
@@ -107,6 +120,7 @@ const useEventStore = create(
     }, 
 
     createWorkShore: async (workshopData) => {
+      console.log(workshopData);
       const result = await makeAuthenticatedRequest("post", "workshop", workshopData);
       console.log("result : ", result);
       if (result && result.statusCode >= 200 && result.statusCode < 300) {
@@ -131,12 +145,12 @@ const useEventStore = create(
     fetchEventbyUUID: async (uuid) => {
       const result = await makeAuthenticatedRequest("get", `event/${uuid}`);
       if (result && result.statusCode >= 200 && result.statusCode < 300) {
-        set({ eventData: result.data });
+        set({ eventData: result.data.event });
         console.log("Fetched Event Data:", result.data);
       } else {
         console.error("Failed to fetch event:", result);
       }
-      return result;
+      return result.data;
     },
     
 

@@ -28,11 +28,11 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    const { eventspeakers, uuid } = await request.json();
+    const { formData, uuid } = await request.json();
 
-    if (!uuid || !eventspeakers || !Array.isArray(eventspeakers)) {
+    if (!Array.isArray(formData.speakers) || formData.speakers.length === 0) {
       return NextResponse.json(
-        { error: "Invalid input: UUID and event speakers are required." },
+        { message: "Invalid input: UUID and event speakers are required.", status: 400, error: true },
         { status: 400 }
       );
     }
@@ -46,24 +46,24 @@ export async function POST(request: Request) {
 
     if (!event) {
       return NextResponse.json(
-        { error: "Event not found." },
+        { message: "Event not found.", status: 404, error: true },
         { status: 404 }
       );
     }
 
     // Save all speakers
     const savedSpeakers = [];
-    for (const speakerData of eventspeakers) {
+    for (const speakerData of formData.speakers) {
       const speaker = speakerRepo.create({ ...speakerData, event });
       const savedSpeaker = await speakerRepo.save(speaker);
       savedSpeakers.push(savedSpeaker);
     }
 
-    return NextResponse.json(savedSpeakers, { status: 201 });
+    return NextResponse.json({ status: 201, data: savedSpeakers, message: "Speakers saved successfully" });
   } catch (error) {
     console.error("Error creating speaker:", error);
     return NextResponse.json(
-      { error: "Failed to create speaker" },
+      { message: "Failed to create speaker", error: true, status: 500 },
       { status: 500 }
     );
   }

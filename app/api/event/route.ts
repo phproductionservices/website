@@ -16,32 +16,78 @@ export async function GET() {
     const eventRepo = db.getRepository(Event);
     const registrationRepo = db.getRepository(Registration);
 
-    // Fetch events and include related entities (workshops, registrations, tickets)
+    // Fetch events and include related entities (workshops, tickets, registrations)
     const events = await eventRepo.find({
       where: { status: EventStatus.ACTIVE },
-      relations: ["workshops", "tickets", "eventspeakers"],
+      relations: [
+        "workshops",
+        "workshops.ticket",
+        "workshops.ticket.registrations",
+        "tickets",
+        "tickets.registrations",
+        "eventspeakers",
+      ],
       order: { created_at: "DESC" },
     });
 
-    const totalAmount = await registrationRepo.sum('amount');
-    const totalCapicity = await registrationRepo.sum('quantity');
-    const activeEventCount = await eventRepo.count({ where: { status: EventStatus.ACTIVE } });
+    // Initialize counters
+    let totalAmount = 0;
+    let totalCapacity = 0;
+    let activeEventCount = events.length;
+    let totalSoldTicket = await registrationRepo.sum('quantity');;
 
-    // Ensure empty arrays for missing relations
-    const eventsWithRelations = events.map(event => ({
-      ...event,
-      workshops: event.workshops ?? [],
-      tickets: event.tickets ?? [],
-      eventspeakers: event.eventspeakers ?? [],
-    }));
+    // Add ticket statistics to each event
+    const eventsWithStats = events.map((event) => {
+      let eventTotalSold = 0;
+      let eventTotalAmount = 0;
+      let eventTotalQuantity = 0;
 
-    return NextResponse.json({ message: 'Events fetch successful!', data: {
-      activeEvent: activeEventCount,
-      totalAmount,
-      totalCapicity,
-      events: eventsWithRelations,
-      
-    }, status: 200, error: false });
+      // Calculate event tickets stats
+      for (const ticket of event.tickets || []) {
+        const ticketsSold = ticket.registrations.length;
+        eventTotalSold += ticketsSold;
+        eventTotalAmount += ticketsSold * ticket.price;
+        eventTotalQuantity += ticket.quantity;
+      }
+
+      // Calculate workshop tickets stats
+      for (const workshop of event.workshops || []) {
+        for (const ticket of workshop.ticket || []) {
+          const ticketsSold = ticket.registrations.length;
+          eventTotalSold += ticketsSold;
+          eventTotalAmount += ticketsSold * ticket.price;
+          eventTotalQuantity += ticket.quantity;
+        }
+      }
+
+      // Update global totals
+      totalAmount += eventTotalAmount;
+      totalCapacity += eventTotalQuantity;
+
+      return {
+        ...event,
+        totalsold: eventTotalSold,
+        totalamount: eventTotalAmount,
+        totalquantity: eventTotalQuantity,
+        workshops: event.workshops ?? [],
+        tickets: event.tickets ?? [],
+        eventspeakers: event.eventspeakers ?? [],
+      };
+    });
+
+    // Return formatted response
+    return NextResponse.json({
+      message: "Events fetch successful!",
+      status: 200,
+      error: false,
+      data: {
+        activeEvent: activeEventCount,
+        totalAmount,
+        totalCapacity,
+        totalSoldTicket,
+        events: eventsWithStats,
+      },
+    });
   } catch (error) {
     console.error("Error fetching events:", error);
     return NextResponse.json(
