@@ -1,10 +1,8 @@
-import { Entity, Column, ManyToOne, PrimaryGeneratedColumn, JoinColumn } from "typeorm";
-import { Event } from "./event.entity";
+import { Entity, Column, ManyToOne, JoinColumn } from "typeorm";
 import { BaseEntity } from "./base.entity";
 
 @Entity()
 export class Eventspeaker extends BaseEntity {
-
   @Column()
   name!: string;
 
@@ -14,7 +12,7 @@ export class Eventspeaker extends BaseEntity {
   @Column({ nullable: true })
   description?: string;
 
-  @ManyToOne(() => Event, (event) => event.eventspeakers, { onDelete: "CASCADE" })
-  event!: Event;
-
+  @ManyToOne("Event", "eventspeakers", { onDelete: "CASCADE" })
+  @JoinColumn()
+  event!: any;
 }

@@ -31,6 +31,10 @@ export default function AddWorkshopPage() {
     setIsAddingWorkshop(false); // Close drawer
   };
 
+  const handleSkip = () => {
+    router.push(`/admin/events/create/${uuid}/success`);
+  }
+
   // Handle submitting all workshops
   const handleSubmitAll = async () => {
     console.log("✅ Submitting Workshops:", workshops);
@@ -52,7 +56,7 @@ export default function AddWorkshopPage() {
 
         // Wait for 3 seconds before redirecting
         setTimeout(() => {
-          router.push(`/admin/events/create/${response.uuid}/success`);
+          router.push(`/admin/events/create/${uuid}/success`);
         }, 1000);
       }
     } catch (error) {
@@ -104,7 +108,9 @@ export default function AddWorkshopPage() {
         )}
 
         {/* Show WorkshopDrawer when adding */}
-        {isAddingWorkshop && <WorkshopDrawer onSubmit={handleNext} uuid={uuid} />}
+        {isAddingWorkshop && (
+          <WorkshopDrawer onSubmit={handleNext} uuid={uuid} />
+        )}
 
         {/* Submit Workshops Button with Loading */}
         {workshops.length > 0 && (
@@ -125,6 +131,15 @@ export default function AddWorkshopPage() {
           </Button>
         )}
       </Card>
+      <Button
+        onClick={handleSkip}
+        className="w-full mt-4 bg-[#27264E] hover:bg-[#1f1e3d] transition-colors"
+        disabled={isLoading}
+      >
+        <span className="flex items-center justify-center">
+            Skip
+          </span>
+      </Button>
     </div>
   );
 }

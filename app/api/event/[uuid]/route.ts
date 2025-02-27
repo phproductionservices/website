@@ -14,10 +14,16 @@ export async function GET(
     const db = await initializeDB();
     const eventRepo = db.getRepository(Event);
 
-    // ✅ Select only the fields you need
+    // ✅ Fetch event with tickets and registrations
     const event = await eventRepo.findOne({
       where: { uuid: params.uuid },
-      relations: ["workshops", "workshops.ticket", "workshops.ticket.registrations", "tickets", "tickets.registrations"],
+      relations: [
+        "workshops",
+        "workshops.ticket",
+        "workshops.ticket.registrations",
+        "tickets",
+        "tickets.registrations",
+      ],
       select: [
         "id",
         "uuid",
@@ -46,14 +52,43 @@ export async function GET(
 
     if (!event) {
       return NextResponse.json(
-        { error: "Event not found" },
+        { message: "Event not found", status: 404, error: true },
         { status: 404 }
       );
     }
 
+    // ✅ Calculate ticket metrics
+    let totalsold = 0;
+    let totalamount = 0;
+    let totalquantity = 0;
+
+    // Loop through event tickets
+    for (const ticket of event.tickets || []) {
+      const ticketsSold = ticket.registrations.length;
+      totalsold += ticketsSold;
+      totalamount += ticketsSold * ticket.price;
+      totalquantity += ticket.quantity;
+    }
+
+    // Loop through workshop tickets
+    for (const workshop of event.workshops || []) {
+      for (const ticket of workshop.ticket || []) {
+        const ticketsSold = ticket.registrations.length;
+        totalsold += ticketsSold;
+        totalamount += ticketsSold * ticket.price;
+        totalquantity += ticket.quantity;
+      }
+    }
+
+    // ✅ Return structured response
     return NextResponse.json({
       status: 200,
-      data: event,
+      data: {
+        totalsold,
+        totalamount,
+        totalquantity,
+        event,
+      },
       message: "Event found",
       error: null,
     });

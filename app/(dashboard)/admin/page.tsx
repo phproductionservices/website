@@ -49,6 +49,9 @@ type Event = {
   address: string;
   eventImageUrl: string;
   status: string;
+  totalsold: number;
+  totalamount: number;
+  totalquantity: number;
 };
 
 export default function AdminDashboard() {
@@ -60,7 +63,12 @@ export default function AdminDashboard() {
   const [totalAmount, setTotalAmount] = useState(0);
   const [totalCapicity, setTotalCapicity] = useState(0);
   const [activeEvent, setActiveEvent] = useState(0);
+  const [totalSoldTicket, setTotalSoldTicket] = useState(0);
   const router = useRouter();
+
+  const calculateProgress = (sold: number, total: number) => {
+    return (sold / total) * 100;
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -75,8 +83,9 @@ export default function AdminDashboard() {
         } else if (response.statusCode === 200) {
           setEvents(response.data.events);
           setTotalAmount(response.data.totalAmount);
-          setTotalCapicity(response.data.totalCapicity);
+          setTotalCapicity(response.data.totalCapacity);
           setActiveEvent(response.data.activeEvent);
+          setTotalSoldTicket(response.data.totalSoldTicket);
         }
       } catch (error) {
         console.error("Error fetching events: ", error);
@@ -120,50 +129,60 @@ export default function AdminDashboard() {
       </div>
 
       {/* Skeleton for analytics */}
-        {
-          isFetchedEvents ? (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-              <Card className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-gray-500">Total Revenue</p>
-                    <p className="text-2xl font-bold">£ {totalAmount}</p>
-                  </div>
-                  <DollarSign className="w-8 h-8 text-green-500" />
-                </div>
-                {/* <div className="mt-2 text-sm text-green-500">
+      {isFetchedEvents ? (
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          <Card className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-500">Total Revenue</p>
+                <p className="text-2xl font-bold">£ {totalAmount}</p>
+              </div>
+              <DollarSign className="w-8 h-8 text-green-500" />
+            </div>
+            {/* <div className="mt-2 text-sm text-green-500">
                   +12.5% from last month
                 </div> */}
-              </Card>
-              <Card className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-gray-500">Active Events</p>
-                    <p className="text-2xl font-bold">{activeEvent}</p>
-                  </div>
-                  <Calendar className="w-8 h-8 text-blue-500" />
-                </div>
-                {/* <div className="mt-2 text-sm text-blue-500">
+          </Card>
+          <Card className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-500">Active Events</p>
+                <p className="text-2xl font-bold">{activeEvent}</p>
+              </div>
+              <Calendar className="w-8 h-8 text-blue-500" />
+            </div>
+            {/* <div className="mt-2 text-sm text-blue-500">
                   2 starting this week
                 </div> */}
-              </Card>
-              <Card className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-gray-500">Total Tickets Sold</p>
-                    <p className="text-2xl font-bold">{totalCapicity}</p>
-                  </div>
-                  <Ticket className="w-8 h-8 text-purple-500" />
-                </div>
-                {/* <div className="mt-2 text-sm text-purple-500">
+          </Card>
+          <Card className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-500">Total Tickets</p>
+                <p className="text-2xl font-bold">{totalCapicity}</p>
+              </div>
+              <Ticket className="w-8 h-8 text-purple-500" />
+            </div>
+            {/* <div className="mt-2 text-sm text-purple-500">
                   +5.2% from last week
                 </div> */}
-              </Card>
+          </Card>
+          <Card className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-500">Total Tickets Sold</p>
+                <p className="text-2xl font-bold">{totalSoldTicket}</p>
+              </div>
+              <Ticket className="w-8 h-8 text-purple-500" />
             </div>
-          ) : (
-            <Skeleton key={1} className="h-24 rounded-lg" />
-          )
-        }
+            {/* <div className="mt-2 text-sm text-purple-500">
+                  +5.2% from last week
+                </div> */}
+          </Card>
+        </div>
+      ) : (
+        <Skeleton key={1} className="h-24 rounded-lg" />
+      )}
 
       <div className="flex gap-4 mb-6">
         <div className="flex-1 relative">
@@ -229,6 +248,69 @@ export default function AdminDashboard() {
                   >
                     <TableCell>
                       <div className="flex items-center gap-3">
+                        <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
+                          <div className="relative w-12 h-12">
+                            <svg className="w-full h-full transform -rotate-90">
+                              <circle
+                                cx="24"
+                                cy="24"
+                                r="20"
+                                className="text-gray-200"
+                                strokeWidth="4"
+                                stroke="currentColor"
+                                fill="transparent"
+                              />
+                              <circle
+                                cx="24"
+                                cy="24"
+                                r="20"
+                                className="text-blue-600"
+                                strokeWidth="4"
+                                strokeDasharray={125.66} // 2 * π * r (2 * 3.1416 * 20)
+                                strokeDashoffset={
+                                  125.66 *
+                                  (1 -
+                                    calculateProgress(
+                                      event.totalsold,
+                                      event.totalquantity
+                                    ) /
+                                      100)
+                                }
+                                strokeLinecap="round"
+                                stroke="currentColor"
+                                fill="transparent"
+                                style={{
+                                  transition: "stroke-dashoffset 0.5s ease-out",
+                                }}
+                              />
+                            </svg>
+                            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
+                              <span className="text-[0.5rem] font-bold text-blue-600">
+                                {Math.round(
+                                  calculateProgress(
+                                    event.totalsold,
+                                      event.totalquantity
+                                  )
+                                )}
+                                %
+                              </span>
+                              <span className="block text-[0.6rem] font-medium text-blue-400 uppercase mt-[-2px]">
+                                SOLD
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                        <div>
+                          <div className="font-medium">{event.title}</div>
+                          <div className="text-sm text-gray-500">
+                            {event.category}
+                          </div>
+                        </div>
+                      </div>
+                    </TableCell>
+
+                    {/* <TableCell>
+                      <div className="flex items-center gap-3">
                         <img
                           src={event.eventImageUrl}
                           alt={event.title}
@@ -241,7 +323,7 @@ export default function AdminDashboard() {
                           </div>
                         </div>
                       </div>
-                    </TableCell>
+                    </TableCell> */}
                     <TableCell>
                       <div className="text-sm">
                         <div>{formatDate(event.date)}</div>

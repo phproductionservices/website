@@ -57,7 +57,7 @@ export default function EventsPage() {
           await clearAuth();
           router.push("/");
         } else if (response.statusCode === 200) {
-          setEvents(response.data);
+          setEvents(response.data.events);
           console.log("Number of events: ", response.data);
         }
       } catch (error) {

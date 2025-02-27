@@ -40,7 +40,7 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    const { workshops, eventuuid } = await request.json();
+    const { workshops, uuid } = await request.json();
 
     if (!Array.isArray(workshops) || workshops.length === 0) {
       return NextResponse.json(
@@ -56,7 +56,7 @@ export async function POST(request: Request) {
     const speakerRepo = db.getRepository(Speaker);
 
     // Check if the event exists
-    const event = await eventRepo.findOne({ where: { uuid: eventuuid } });
+    const event = await eventRepo.findOne({ where: { uuid: uuid } });
     if (!event) {
       return NextResponse.json(
         { message: "Event not found", status: 404, error: true },
