@@ -25,28 +25,28 @@ export async function GET() {
   }
 }
 
-export async function POST(request: Request) {
-  try {
-    const { name, description, imageUrl, workshopId } = await request.json();
+// export async function POST(request: Request) {
+//   try {
+//     const { name, description, imageUrl, workshopId } = await request.json();
 
-    const db = await initializeDB();
-    const speakerRepo = db.getRepository(Speaker);
+//     const db = await initializeDB();
+//     const speakerRepo = db.getRepository(Speaker);
 
-    const speaker = speakerRepo.create({
-      name,
-      description,
-      imageUrl,
-      workshop: workshopId ? { id: workshopId } : null
-    });
+//     const speaker = speakerRepo.create({
+//       name,
+//       description,
+//       imageUrl,
+//       workshop: workshopId ? { id: workshopId } : null
+//     });
 
-    await speakerRepo.save(speaker);
+//     await speakerRepo.save(speaker);
 
-    return NextResponse.json(speaker, { status: 201 });
-  } catch (error) {
-    console.error("Error creating speaker:", error);
-    return NextResponse.json(
-      { error: "Failed to create speaker" },
-      { status: 500 }
-    );
-  }
-}
+//     return NextResponse.json(speaker, { status: 201 });
+//   } catch (error) {
+//     console.error("Error creating speaker:", error);
+//     return NextResponse.json(
+//       { error: "Failed to create speaker" },
+//       { status: 500 }
+//     );
+//   }
+// }

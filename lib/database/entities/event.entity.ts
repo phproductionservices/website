@@ -4,6 +4,7 @@ import { Registration } from "./registration.entity";
 import { UserRegistration } from "./userRegistration.entity";
 import { EventStatus } from "@/lib/base";
 import { Ticket } from "./ticket.entity";
+import { Eventspeaker } from "./event-speaker.entity";
 
 @Entity()
 export class Event extends BaseEntity {
@@ -65,9 +66,18 @@ export class Event extends BaseEntity {
   @Column({ nullable: true })
   country!: string;
 
+  @Column({ nullable: true })
+  description?: string;
+
+  @Column({ nullable: true })
+  organizer?: string;
+
   @ManyToOne(() => UserRegistration, user => user.events)
   @JoinColumn()
   registeredusers!: UserRegistration;
+
+  @OneToMany(() => Eventspeaker, (eventSpeaker) => eventSpeaker.event)
+  eventspeakers!: Eventspeaker[];
 
   // @OneToMany(() => Registration, registration => registration.event)
   // registrations!: Registration[];
@@ -77,4 +87,5 @@ export class Event extends BaseEntity {
 
   @OneToMany("Workshop", "event")
   workshops!: any[];
+
 }

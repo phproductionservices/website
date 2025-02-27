@@ -43,7 +43,9 @@ interface FormData {
   city: string;
   state: string;
   country: string;
-  [key: string]: string | boolean; // Index signature
+  [key: string]: string | boolean;
+  description: string;
+  organizer: string;
 }
 
 export default function CreateEventPage() {
@@ -72,6 +74,8 @@ export default function CreateEventPage() {
     city: "",
     state: "",
     country: "",
+    description: "",
+    organizer: "",
   });
 
   const validateForm = () => {
@@ -92,6 +96,8 @@ export default function CreateEventPage() {
       "city",
       "state",
       "country",
+      "description",
+      "organizer",
     ] as const;
 
     requiredFields.forEach((field) => {
@@ -131,7 +137,7 @@ export default function CreateEventPage() {
 
         // Wait for 3 seconds before redirecting
         setTimeout(() => {
-          router.push(`/admin/events/create/${response.data.uuid}/tickets`);
+          router.push(`/admin/events/create/${response.data.uuid}/speaker`);
 
         }, 2000);
       } else {
@@ -262,6 +268,22 @@ export default function CreateEventPage() {
             </div>
 
             <div>
+              <Label htmlFor="title">Event Organizer</Label>
+              <Input
+                id="organizer"
+                className="mt-1"
+                placeholder="Enter event organizer"
+                value={formData.organizer}
+                onChange={(e) =>
+                  setFormData((prev) => ({ ...prev, organizer: e.target.value }))
+                }
+              />
+              {errors.title && (
+                <p className="text-red-500 text-sm mt-1">{errors.organizer}</p>
+              )}
+            </div>
+
+            <div>
               <Label htmlFor="category">Category</Label>
               <Select
                 value={formData.category}
@@ -300,7 +322,24 @@ export default function CreateEventPage() {
               )}
             </div>
 
-            <div className="grid grid-cols-2 gap-6">
+            <div>
+              <Label htmlFor="overview">Event Description</Label>
+              <Textarea
+                id="description"
+                className="mt-1"
+                placeholder="Write about your event"
+                rows={4}
+                value={formData.description}
+                onChange={(e) =>
+                  setFormData((prev) => ({ ...prev, description: e.target.value }))
+                }
+              />
+              {errors.overview && (
+                <p className="text-red-500 text-sm mt-1">{errors.description}</p>
+              )}
+            </div>
+
+            <div className="grid grid-cols-3 gap-6">
               <div>
                 <Label>Event Type</Label>
                 <Select
@@ -344,8 +383,28 @@ export default function CreateEventPage() {
                   </SelectContent>
                 </Select>
               </div>
+              <div>
+                <Label>Workshop Option</Label>
+                <Select
+                  value={formData.isAllowWorkshop ? "true" : "false"}
+                  onValueChange={
+                    (value) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        isAllowWorkshop: value === "true",
+                      })) // Convert back to boolean
+                  }
+                >
+                  <SelectTrigger className="mt-1">
+                    <SelectValue placeholder="Select ticket option" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="true">Enable Workshop</SelectItem>
+                    <SelectItem value="false">Do no allow workshop</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
-
             <div className="grid grid-cols-3 gap-6">
               <div>
                 <Label htmlFor="date">Date</Label>

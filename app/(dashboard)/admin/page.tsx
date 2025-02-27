@@ -52,11 +52,14 @@ type Event = {
 };
 
 export default function AdminDashboard() {
-  const {allevents, fetchEventAll } = useEventStore();
+  const { allevents, fetchEventAll } = useEventStore();
   const [searchQuery, setSearchQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("All");
   const [isFetchedEvents, setFetchedEvents] = useState(false);
   const [allfetchedevents, setEvents] = useState<Event[]>([]);
+  const [totalAmount, setTotalAmount] = useState(0);
+  const [totalCapicity, setTotalCapicity] = useState(0);
+  const [activeEvent, setActiveEvent] = useState(0);
   const router = useRouter();
 
   useEffect(() => {
@@ -64,10 +67,16 @@ export default function AdminDashboard() {
       setFetchedEvents(false);
       try {
         const response = await fetchEventAll();
-        if (response.statusCode === 404 && response.message === "Token has expired") {
+        if (
+          response.statusCode === 404 &&
+          response.message === "Token has expired"
+        ) {
           router.push("/");
         } else if (response.statusCode === 200) {
-          setEvents(response.data);
+          setEvents(response.data.events);
+          setTotalAmount(response.data.totalAmount);
+          setTotalCapicity(response.data.totalCapicity);
+          setActiveEvent(response.data.activeEvent);
         }
       } catch (error) {
         console.error("Error fetching events: ", error);
@@ -111,24 +120,50 @@ export default function AdminDashboard() {
       </div>
 
       {/* Skeleton for analytics */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        {[...Array(4)].map((_, i) =>
+        {
           isFetchedEvents ? (
-            <Card key={i} className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-500">Analytics</p>
-                  <p className="text-2xl font-bold">Loading...</p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+              <Card className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-gray-500">Total Revenue</p>
+                    <p className="text-2xl font-bold">£ {totalAmount}</p>
+                  </div>
+                  <DollarSign className="w-8 h-8 text-green-500" />
                 </div>
-                <Skeleton className="w-8 h-8 rounded-md" />
-              </div>
-              <div className="mt-2 text-sm text-gray-500">Updating...</div>
-            </Card>
+                {/* <div className="mt-2 text-sm text-green-500">
+                  +12.5% from last month
+                </div> */}
+              </Card>
+              <Card className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-gray-500">Active Events</p>
+                    <p className="text-2xl font-bold">{activeEvent}</p>
+                  </div>
+                  <Calendar className="w-8 h-8 text-blue-500" />
+                </div>
+                {/* <div className="mt-2 text-sm text-blue-500">
+                  2 starting this week
+                </div> */}
+              </Card>
+              <Card className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-gray-500">Total Tickets Sold</p>
+                    <p className="text-2xl font-bold">{totalCapicity}</p>
+                  </div>
+                  <Ticket className="w-8 h-8 text-purple-500" />
+                </div>
+                {/* <div className="mt-2 text-sm text-purple-500">
+                  +5.2% from last week
+                </div> */}
+              </Card>
+            </div>
           ) : (
-            <Skeleton key={i} className="h-24 rounded-lg" />
+            <Skeleton key={1} className="h-24 rounded-lg" />
           )
-        )}
-      </div>
+        }
 
       <div className="flex gap-4 mb-6">
         <div className="flex-1 relative">
@@ -187,7 +222,11 @@ export default function AdminDashboard() {
                   </TableRow>
                 ))
               : filteredEvents.map((event) => (
-                  <TableRow key={event.id} className="cursor-pointer hover:bg-gray-50" onClick={() => router.push(`/admin/events/${event.uuid}`)}>
+                  <TableRow
+                    key={event.id}
+                    className="cursor-pointer hover:bg-gray-50"
+                    onClick={() => router.push(`/admin/events/${event.uuid}`)}
+                  >
                     <TableCell>
                       <div className="flex items-center gap-3">
                         <img
@@ -197,7 +236,9 @@ export default function AdminDashboard() {
                         />
                         <div>
                           <div className="font-medium">{event.title}</div>
-                          <div className="text-sm text-gray-500">{event.category}</div>
+                          <div className="text-sm text-gray-500">
+                            {event.category}
+                          </div>
                         </div>
                       </div>
                     </TableCell>
@@ -205,7 +246,8 @@ export default function AdminDashboard() {
                       <div className="text-sm">
                         <div>{formatDate(event.date)}</div>
                         <div className="text-gray-500">
-                          {formatTime(event.startTime)} - {formatTime(event.endTime)}
+                          {formatTime(event.startTime)} -{" "}
+                          {formatTime(event.endTime)}
                         </div>
                       </div>
                     </TableCell>
@@ -216,7 +258,9 @@ export default function AdminDashboard() {
                       </div>
                     </TableCell>
                     <TableCell>
-                      <Badge className={getStatusColor(event.status)}>{event.status}</Badge>
+                      <Badge className={getStatusColor(event.status)}>
+                        {event.status}
+                      </Badge>
                     </TableCell>
                     <TableCell>
                       <Button variant="ghost" size="icon">

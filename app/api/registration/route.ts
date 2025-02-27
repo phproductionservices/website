@@ -29,9 +29,9 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    const { firstName, lastName, email, phone, tickets } = await request.json();
+    const { tickets } = await request.json();
 
-    if (!firstName || !lastName || !email || !phone || !Array.isArray(tickets) || tickets.length === 0) {
+    if (!Array.isArray(tickets) || tickets.length === 0) {
       return NextResponse.json({ message: "Invalid request data", status: 400, errors: true }, { status: 400 });
     }
 
@@ -40,13 +40,13 @@ export async function POST(request: Request) {
 
     const createdRegistrations = tickets.map(ticket => {
       return registrationRepo.create({
-        firstName,
-        lastName,
-        email,
-        phone,
+        firstName: ticket.firstName,
+        lastName: ticket.lastName,
+        email: ticket.email,
+        phone: ticket.phone,
         amount: ticket.amount,
         name: ticket.name,
-        ticketRef: createTicketReference(firstName, ticket.ticketId),
+        ticketRef: createTicketReference(ticket.firstName, ticket.ticketId),
         pricePerTicket: ticket.pricePerTicket,
         quantity: ticket.quantity,
         type: ticket.type,
