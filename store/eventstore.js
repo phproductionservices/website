@@ -120,7 +120,7 @@ const useEventStore = create(
     fetchEventAll: async () => {
       const result = await makeAuthenticatedRequest("get", "event");
       if (result && result.statusCode >= 200 && result.statusCode < 300) {
-        set({ allevents: result.data });
+        set({ allevents: result.data.events });
         console.log("Number of events: ", result.data.length);
       } else {
         console.error("Failed to fetch events:", result);

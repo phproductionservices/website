@@ -10,6 +10,7 @@ import { Ticket } from "./entities/ticket.entity";
 import { Workshop } from "./entities/workshop.entity";
 import { Event } from "./entities/event.entity";
 import { UserRegistration } from "./entities/userRegistration.entity";
+import { Eventspeaker } from "./entities/event-speaker.entity";
 
 export const AppDataSource = new DataSource({
   type: "mysql",
@@ -23,6 +24,7 @@ export const AppDataSource = new DataSource({
   entities: [
     User,
     Ticket,
+    Eventspeaker,
     Registration,
     Workshop,
     Speaker,

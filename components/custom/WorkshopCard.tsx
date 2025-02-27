@@ -57,7 +57,7 @@ export default function WorkshopCard({ workshop }: WorkshopProps) {
       <h3 className="text-lg font-semibold">{workshop.title}</h3>
       <p className="text-gray-500">{formatDate(workshop.date)}</p>
       <p className="text-gray-500">
-        {formatTime(workshop.startTime)} - {formatTime(workshop.endTime)}
+        {workshop.startTime} - {workshop.endTime}
       </p>
 
       {workshop.isPaidFor && workshop.ticket.length > 0 && (

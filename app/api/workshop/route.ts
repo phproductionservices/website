@@ -24,7 +24,7 @@ export async function GET() {
     // Ensure missing relations return empty arrays
     const workshopsWithRelations = workshops.map(workshop => ({
       ...workshop,
-      registrations: workshop.registrations ?? [],
+      // registrations: workshop.registrations ?? [],
       speakers: workshop.speakers ?? [],
     }));
 

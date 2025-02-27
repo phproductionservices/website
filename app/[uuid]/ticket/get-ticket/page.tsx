@@ -75,6 +75,14 @@ export default function GetTicketPage() {
                 <h3 className="font-semibold mb-4">Ticket Details</h3>
                 <div className="space-y-2">
                   <div className="flex justify-between">
+                    <span className="text-gray-600">Name</span>
+                    <span>{ticket.firstName} {ticket.lastName}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Ticket Price</span>
+                    <span>£{ticket.amount}</span>
+                  </div>
+                  <div className="flex justify-between">
                     <span className="text-gray-600">Ticket Type</span>
                     <span>{ticket.ticketType || "General"}</span>
                   </div>
