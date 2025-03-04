@@ -25,7 +25,7 @@ interface WorkShop {
   startTime: string;
   endTime: string;
   isPaidFor: boolean;
-  ticket: Ticket[];
+  tickets: Ticket[];
 }
 
 type WorkshopProps = {
@@ -60,7 +60,7 @@ export default function WorkshopCard({ workshop }: WorkshopProps) {
         {workshop.startTime} - {workshop.endTime}
       </p>
 
-      {workshop.isPaidFor && workshop.ticket.length > 0 && (
+      {workshop.isPaidFor && workshop.tickets.length > 0 && (
         <Collapsible className="mt-2">
           <CollapsibleTrigger asChild>
             <Button variant="outline" className="w-full">
@@ -69,7 +69,7 @@ export default function WorkshopCard({ workshop }: WorkshopProps) {
           </CollapsibleTrigger>
           <CollapsibleContent className="mt-2 border rounded-md p-3 bg-gray-50">
             <h4 className="text-md font-medium mb-2">Available Tickets:</h4>
-            {workshop.ticket.map((ticket, index) => (
+            {workshop.tickets.map((ticket, index) => (
               <div key={index} className="p-4 border rounded-lg">
               <div className="flex justify-between items-start mb-2">
                 <div>

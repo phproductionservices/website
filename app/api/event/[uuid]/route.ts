@@ -1,53 +1,24 @@
 import { NextResponse } from "next/server";
-import { initializeDB } from "@/lib/database/db";
-import { Event } from "@/lib/database/entities/event.entity";
+import { prisma } from "@/lib/database/prisma";
 import { createSlug } from "@/lib/utils";
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
-
-export async function GET(
-  request: Request,
-  { params }: { params: { uuid: string } }
-) {
+export async function GET(request: Request,
+  { params }: { params: { uuid: string } }) {
   try {
-    const db = await initializeDB();
-    const eventRepo = db.getRepository(Event);
-
-    // ✅ Fetch event with tickets and registrations
-    const event = await eventRepo.findOne({
+    const event = await prisma.event.findUnique({
       where: { uuid: params.uuid },
-      relations: [
-        "workshops",
-        "workshops.ticket",
-        "workshops.ticket.registrations",
-        "tickets",
-        "tickets.registrations",
-      ],
-      select: [
-        "id",
-        "uuid",
-        "created_at",
-        "updated_at",
-        "slug",
-        "title",
-        "category",
-        "overview",
-        "eventType",
-        "date",
-        "startTime",
-        "endTime",
-        "venue",
-        "address",
-        "postcode",
-        "eventImageUrl",
-        "isAllowWorkshop",
-        "status",
-        "isPaidFor",
-        "city",
-        "state",
-        "country",
-      ],
+      include: {
+        workshops: {
+          include: {
+            tickets: {
+              include: { registrations: true },
+            },
+          },
+        },
+        tickets: {
+          include: { registrations: true },
+        },
+      },
     });
 
     if (!event) {
@@ -57,12 +28,10 @@ export async function GET(
       );
     }
 
-    // ✅ Calculate ticket metrics
     let totalsold = 0;
     let totalamount = 0;
     let totalquantity = 0;
 
-    // Loop through event tickets
     for (const ticket of event.tickets || []) {
       const ticketsSold = ticket.registrations.length;
       totalsold += ticketsSold;
@@ -70,9 +39,8 @@ export async function GET(
       totalquantity += ticket.quantity;
     }
 
-    // Loop through workshop tickets
     for (const workshop of event.workshops || []) {
-      for (const ticket of workshop.ticket || []) {
+      for (const ticket of workshop.tickets || []) {
         const ticketsSold = ticket.registrations.length;
         totalsold += ticketsSold;
         totalamount += ticketsSold * ticket.price;
@@ -80,7 +48,6 @@ export async function GET(
       }
     }
 
-    // ✅ Return structured response
     return NextResponse.json({
       status: 200,
       data: {
@@ -101,37 +68,29 @@ export async function GET(
   }
 }
 
-export async function PUT(
-  request: Request,
-  { params }: { params: { uuid: string } }
-) {
+export async function PUT(request: Request,
+  { params }: { params: { uuid: string } }) {
   try {
-    const { 
-      title, 
-      overview, 
-      category, 
-      eventType, 
-      date, 
-      startTime, 
-      endTime, 
-      venue, 
-      address, 
-      eventImageUrl, 
-      city,   
-      state,  
+    const {
+      title,
+      overview,
+      category,
+      eventType,
+      date,
+      startTime,
+      endTime,
+      venue,
+      address,
+      eventImageUrl,
+      city,
+      state,
       country,
       postcode,
       isAllowWorkshop,
-      isPaidFor
+      isPaidFor,
     } = await request.json();
 
-    const db = await initializeDB();
-    const eventRepo = db.getRepository(Event);
-
-    // Find event by UUID
-    const event = await eventRepo.findOne({
-      where: { uuid: params.uuid }
-    });
+    const event = await prisma.event.findUnique({ where: { uuid: params.uuid } });
 
     if (!event) {
       return NextResponse.json(
@@ -140,10 +99,9 @@ export async function PUT(
       );
     }
 
-    // Check for duplicate slug (if title is changing)
     const newSlug = createSlug(title);
     if (event.title !== title) {
-      const existingEvent = await eventRepo.findOne({ where: { slug: newSlug } });
+      const existingEvent = await prisma.event.findUnique({ where: { slug: newSlug } });
       if (existingEvent) {
         return NextResponse.json(
           { message: "Another event exists with a similar name", error: true, status: 400 },
@@ -152,7 +110,6 @@ export async function PUT(
       }
     }
 
-    // Validate date and times
     if (!date || !startTime || !endTime) {
       return NextResponse.json(
         { message: "Invalid date or time format", error: true, status: 400 },
@@ -163,36 +120,35 @@ export async function PUT(
     const fullStartTime = new Date(`${date}T${startTime}:00`);
     const fullEndTime = new Date(`${date}T${endTime}:00`);
 
-    // Update only the event fields (excluding workshops & tickets)
-    Object.assign(event, {
-      title,
-      slug: newSlug, // Update slug if title changes
-      overview,
-      category,
-      eventType,
-      date: new Date(date),
-      startTime: fullStartTime,
-      endTime: fullEndTime,
-      venue,
-      address,
-      eventImageUrl,
-      city,   
-      state,  
-      country, 
-      postcode,
-      isAllowWorkshop: isAllowWorkshop ?? false,
-      isPaidFor: isPaidFor ?? false,
+    const updatedEvent = await prisma.event.update({
+      where: { uuid: params.uuid },
+      data: {
+        title,
+        slug: newSlug,
+        overview,
+        category,
+        eventType,
+        date: new Date(date),
+        startTime: fullStartTime,
+        endTime: fullEndTime,
+        venue,
+        address,
+        eventImageUrl,
+        city,
+        state,
+        country,
+        postcode,
+        isAllowWorkshop: isAllowWorkshop ?? false,
+        isPaidFor: isPaidFor ?? false,
+      },
     });
-
-    await eventRepo.save(event);
 
     return NextResponse.json({
       message: "Event updated successfully",
-      data: event,
+      data: updatedEvent,
       status: 200,
-      error: false
+      error: false,
     });
-
   } catch (error) {
     console.error("Error updating event:", error);
     return NextResponse.json(
@@ -202,18 +158,10 @@ export async function PUT(
   }
 }
 
-
-export async function DELETE(
-  request: Request,
-  { params }: { params: { uuid: string } }
-) {
+export async function DELETE(request: Request,
+  { params }: { params: { uuid: string } }) {
   try {
-    const db = await initializeDB();
-    const eventRepo = db.getRepository(Event);
-
-    const event = await eventRepo.findOne({
-      where: { uuid: params.uuid }
-    });
+    const event = await prisma.event.findUnique({ where: { uuid: params.uuid } });
 
     if (!event) {
       return NextResponse.json(
@@ -222,7 +170,7 @@ export async function DELETE(
       );
     }
 
-    await eventRepo.softRemove(event);
+    await prisma.event.delete({ where: { uuid: params.uuid } });
 
     return NextResponse.json({ message: "Event deleted successfully" });
   } catch (error) {

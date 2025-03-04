@@ -1,18 +1,14 @@
+import { prisma } from "@/lib/database/prisma";
 import { NextResponse } from "next/server";
-import { initializeDB } from "@/lib/database/db";
-import { Speaker } from "@/lib/database/entities/speaker.entity";
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
 
 export async function GET() {
   try {
-    const db = await initializeDB();
-    const speakerRepo = db.getRepository(Speaker);
-
-    const speakers = await speakerRepo.find({
-      relations: ["workshop"],
-      order: { created_at: "DESC" },
+    const speakers = await prisma.speaker.findMany({
+      include: {
+        workshop: true,
+      },
+      orderBy: { created_at: "desc" },
     });
 
     return NextResponse.json(speakers);
@@ -24,6 +20,7 @@ export async function GET() {
     );
   }
 }
+
 
 // export async function POST(request: Request) {
 //   try {

@@ -1,20 +1,17 @@
 import { NextResponse } from "next/server";
-import { initializeDB } from "@/lib/database/db";
-import { UserRegistration } from "@/lib/database/entities/userRegistration.entity";
-import * as jwt from 'jsonwebtoken';
+import * as jwt from "jsonwebtoken";
+import bcrypt from "bcryptjs";
+import { prisma } from "@/lib/database/prisma";
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
+const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key";
 
-export async function POST(request: Request) {
+export async function POST(request: any) {
   try {
     const { email, password, fullName, phone, role } = await request.json();
 
-    const db = await initializeDB();
-    const userRepo = db.getRepository(UserRegistration);
-
     // Check if user already exists
-    const existingUser = await userRepo.findOne({
-      where: { email }
+    const existingUser = await prisma.userRegistration.findUnique({
+      where: { email },
     });
 
     if (existingUser) {
@@ -24,35 +21,41 @@ export async function POST(request: Request) {
       );
     }
 
-    // Create new user
-    const user = userRepo.create({
-      email,
-      password,
-      fullName,
-      phone,
-      role
-    });
+    // Hash password
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-    await userRepo.save(user);
+    // Create new user
+    const user = await prisma.userRegistration.create({
+      data: {
+        email,
+        password: hashedPassword,
+        fullName,
+        phone,
+        role,
+      },
+    });
 
     // Generate JWT token
     const token = jwt.sign(
-      { 
-        sub: user.uuid,
+      {
+        sub: user.id,
         email: user.email,
-        role: user.role
+        role: user.role,
       },
       JWT_SECRET,
-      { expiresIn: '3h' }
+      { expiresIn: "3h" }
     );
 
     // Remove password from response
     const { password: _, ...userWithoutPassword } = user;
 
-    return NextResponse.json({
-      user: userWithoutPassword,
-      access_token: token
-    }, { status: 201 });
+    return NextResponse.json(
+      {
+        user: userWithoutPassword,
+        access_token: token,
+      },
+      { status: 201 }
+    );
   } catch (error) {
     console.error("Error during registration:", error);
     return NextResponse.json(

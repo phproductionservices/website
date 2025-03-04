@@ -79,9 +79,6 @@ export class Event extends BaseEntity {
   @OneToMany(() => Eventspeaker, (eventSpeaker) => eventSpeaker.event)
   eventspeakers!: Eventspeaker[];
 
-  // @OneToMany(() => Registration, registration => registration.event)
-  // registrations!: Registration[];
-
   @OneToMany("Ticket", "event", { nullable: true })
   tickets?: Ticket[];
 

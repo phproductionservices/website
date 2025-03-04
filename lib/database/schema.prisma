@@ -1,0 +1,192 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql" // Change according to your database
+  url      = env("DATABASE_URL")
+  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
+}
+
+model City {
+  id         Int      @id @default(autoincrement())
+  uuid       String   @unique @default(uuid())
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  deleted_at DateTime?
+  name       String
+}
+
+model State {
+  id         Int      @id @default(autoincrement())
+  uuid       String   @unique @default(uuid())
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  deleted_at DateTime?
+  name       String
+}
+
+model Country {
+  id         Int      @id @default(autoincrement())
+  uuid       String   @unique @default(uuid())
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  deleted_at DateTime?
+  name       String
+}
+
+model Event {
+  id              Int           @id @default(autoincrement())
+  uuid            String        @unique @default(uuid())
+  created_at      DateTime      @default(now())
+  updated_at      DateTime      @updatedAt
+  deleted_at      DateTime?
+  title           String
+  slug            String        @unique
+  category        String
+  overview        String
+  eventType       String
+  date            DateTime
+  startTime       DateTime
+  endTime         DateTime
+  venue           String
+  address         String
+  postcode        String
+  eventImageUrl   String
+  isAllowWorkshop Boolean       @default(false)
+  status          EventStatus   @default(ACTIVE)
+  isPaidFor       Boolean       @default(false)
+  city            String?
+  state           String?
+  country         String?
+  description     String?
+  organizer       String?
+  registeredUsersId Int?
+  registeredUsers UserRegistration? @relation(fields: [registeredUsersId], references: [id], name: "UserRegistrationToEvent")
+  eventSpeakers   Eventspeaker[] @relation("EventToEventSpeaker")
+  tickets         Ticket[] @relation("EventToTicket")
+  workshops       Workshop[] @relation("EventToWorkshop")
+}
+
+enum EventStatus {
+  ACTIVE
+  INACTIVE
+  CANCELLED
+}
+
+enum TicketType {
+  Event
+  Workshop
+}
+
+model Eventspeaker {
+  id         Int      @id @default(autoincrement())
+  uuid       String   @unique @default(uuid())
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  deleted_at DateTime?
+  name       String
+  speakerUrl String?
+  description String?
+  eventId    Int
+  event      Event @relation(fields: [eventId], references: [id], onDelete: Cascade, name: "EventToEventSpeaker")
+}
+
+model Ticket {
+  id         Int        @id @default(autoincrement())
+  uuid       String     @unique @default(uuid())
+  created_at DateTime   @default(now())
+  updated_at DateTime   @updatedAt
+  deleted_at DateTime?
+  type       TicketType @default(Event)
+  name       String
+  price      Float
+  quantity   Int
+  eventId    Int?
+  event      Event? @relation(fields: [eventId], references: [id], name: "EventToTicket")
+  workshopId Int?
+  workshop   Workshop? @relation(fields: [workshopId], references: [id], name: "WorkshopToTicket")
+  registrations Registration[] @relation("TicketToRegistration")
+}
+
+model Registration {
+  id         Int      @id @default(autoincrement())
+  uuid       String   @unique @default(uuid())
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  deleted_at DateTime?
+  firstName  String
+  lastName   String
+  email      String
+  name       String
+  type       String
+  ticketRef  String  @default("TkT-2025")
+  phone      String?
+  pricePerTicket Float
+  amount     Float
+  quantity   Int
+  ticketId   Int
+  ticket     Ticket @relation(fields: [ticketId], references: [id], name: "TicketToRegistration")
+}
+
+model Workshop {
+  id         Int      @id @default(autoincrement())
+  uuid       String   @unique @default(uuid())
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  deleted_at DateTime?
+  title      String
+  date       DateTime
+  startTime  String
+  endTime    String
+  description String
+  isPaidFor  Boolean @default(false)
+  eventId    Int
+  event      Event @relation(fields: [eventId], references: [id], name: "EventToWorkshop")
+  speakers   Speaker[] @relation("WorkshopToSpeaker")
+  tickets    Ticket[] @relation("WorkshopToTicket")
+}
+
+model Speaker {
+  id         Int      @id @default(autoincrement())
+  uuid       String   @unique @default(uuid())
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  deleted_at DateTime?
+  name       String
+  description String
+  imageUrl   String?
+  workshopId Int
+  workshop   Workshop @relation(fields: [workshopId], references: [id], name: "WorkshopToSpeaker")
+}
+
+model User {
+  id         Int      @id @default(autoincrement())
+  uuid       String   @unique @default(uuid())
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  deleted_at DateTime?
+  email      String   @unique
+  role       String
+  name       String
+  phone      String?
+}
+
+model UserRegistration {
+  id         Int      @id @default(autoincrement())
+  uuid       String   @unique @default(uuid())
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  deleted_at DateTime?
+  email      String   @unique
+  role       RoleType @default(ADMIN)
+  fullName   String
+  password   String
+  phone      String?
+  events     Event[] @relation("UserRegistrationToEvent")
+}
+
+enum RoleType {
+  ADMIN
+  USER
+}

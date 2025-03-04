@@ -35,7 +35,7 @@ interface Workshop {
   startTime: string;
   endTime: string;
   isPaidFor: boolean;
-  ticket: Ticket[];
+  tickets: Ticket[];
 }
 
 interface EventData {
@@ -54,7 +54,7 @@ export default function AttendeeCardView({ eventData }: AttendeeProps) {
   // Combine all attendees from event and workshop tickets
   const allAttendees = [
     ...eventData.tickets.flatMap(ticket => ticket.registrations),
-    ...eventData.workshops.flatMap(workshop => workshop.ticket.flatMap(ticket => ticket.registrations))
+    ...eventData.workshops.flatMap(workshop => workshop.tickets.flatMap(ticket => ticket.registrations))
   ];
 
   // Filter attendees based on type selection

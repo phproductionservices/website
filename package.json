@@ -12,11 +12,18 @@
     "migration:generate": "npm run typeorm -- --dataSource=./lib/database/data-source.ts migration:generate",
     "migration:create": "npm run typeorm -- migration:create",
     "migration:run": "npm run typeorm -- --dataSource=./lib/database/data-source.ts migration:run",
-    "schema:drop": "npm run typeorm -- --dataSource=./lib/database/data-source.ts schema:drop"
+    "schema:drop": "npm run typeorm -- --dataSource=./lib/database/data-source.ts schema:drop",
+    "prisma:dev:deploy": "prisma migrate deploy --schema=./lib/database/schema.prisma",
+    "prisma:dev:migrate": "prisma migrate dev --schema=./lib/database/schema.prisma --name",
+    "prisma:migrate:init": "prisma migrate dev --schema=./lib/database/schema.prisma --name init",
+    "prisma:migrate:reset": "npx prisma migrate reset",
+    "prisma:prod:deploy": "npx prisma migrate deploy --schema=./database/schema",
+    "prod:start": "npm prisma:prod:deploy && npm start"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",
     "@next/swc-wasm-nodejs": "13.5.1",
+    "@prisma/client": "^6.4.1",
     "@radix-ui/react-accordion": "^1.2.0",
     "@radix-ui/react-alert-dialog": "^1.1.1",
     "@radix-ui/react-aspect-ratio": "^1.1.0",
@@ -93,8 +100,9 @@
     "@types/crypto-js": "^4.2.2",
     "@types/formidable": "^3.4.5",
     "@types/jsonwebtoken": "^9.0.8",
-    "@types/node": "^22.13.1",
+    "@types/node": "^22.13.9",
     "env-cmd": "^10.1.0",
+    "prisma": "^6.4.1",
     "ts-node": "^10.9.2"
   }
 }
