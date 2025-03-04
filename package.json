@@ -12,8 +12,10 @@
     "prisma:dev:migrate": "prisma migrate dev --schema=./lib/database/schema.prisma --name",
     "prisma:migrate:init": "prisma migrate dev --schema=./lib/database/schema.prisma --name init",
     "prisma:migrate:reset": "npx prisma migrate reset",
-    "prisma:prod:deploy": "npx prisma migrate deploy --schema=./database/schema",
-    "prod:start": "npm prisma:prod:deploy && npm start"
+    "prisma:prod:deploy": "npx prisma migrate deploy --schema=./lib/database/schema.prisma && npm prisma:generate",
+    "prod:start": "npm prisma:prod:deploy && npm start",
+    "prebuild": "echo 'Running prebuild tasks' && yarn prisma:prod:deploy",
+    "postbuild": "echo 'Build complete'"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",
