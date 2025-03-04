@@ -8,25 +8,7 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { Badge } from "@/components/ui/badge";
-
-interface Ticket {
-  id: number;
-  type: string;
-  name: string;
-  price: number;
-  quantity: number;
-}
-
-interface WorkShop {
-  id: number;
-  uuid: string;
-  title: string;
-  date: string;
-  startTime: string;
-  endTime: string;
-  isPaidFor: boolean;
-  tickets: Ticket[];
-}
+import { WorkShop } from "@/lib/database/prisma";
 
 type WorkshopProps = {
   workshop: WorkShop;
@@ -55,7 +37,7 @@ export default function WorkshopCard({ workshop }: WorkshopProps) {
   return (
     <Card className="p-4 border rounded-lg shadow-md w-full mb-4">
       <h3 className="text-lg font-semibold">{workshop.title}</h3>
-      <p className="text-gray-500">{formatDate(workshop.date)}</p>
+      <p className="text-gray-500">{formatDate(String(workshop.date))}</p>
       <p className="text-gray-500">
         {workshop.startTime} - {workshop.endTime}
       </p>

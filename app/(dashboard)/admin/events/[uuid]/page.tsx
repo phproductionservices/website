@@ -21,6 +21,7 @@ import WorkshopCard from "@/components/custom/WorkshopCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import AttendeeCardView from "@/components/custom/AttendeeCardView";
 import Link from "next/link";
+import { Prisma } from "@prisma/client";
 
 // Sample sales data - replace with real data
 const salesData = [
@@ -56,16 +57,22 @@ interface Ticket {
   registrations: Registration[];
 }
 
-interface WorkShop {
-  id: number;
-  uuid: string;
-  title: string;
-  date: string;
-  startTime: string;
-  endTime: string;
-  isPaidFor: boolean;
-  ticket: Ticket[];
-}
+// interface WorkShop {
+//   id: number;
+//   uuid: string;
+//   title: string;
+//   date: string;
+//   startTime: string;
+//   endTime: string;
+//   isPaidFor: boolean;
+//   ticket: Ticket[];
+// }
+
+export type WorkShop = Prisma.WorkshopGetPayload<{
+  include: { 
+    tickets: true;
+   };
+}>;
 
 export default function EventDetailPage() {
   const router = useRouter();

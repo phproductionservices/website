@@ -11,6 +11,8 @@ export const prisma =
 
 if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
 
-// export type ProgramLink = Prisma.ProgramLinkGetPayload<{
-//   include: { program: true };
-// }>;
+export type WorkShop = Prisma.WorkshopGetPayload<{
+  include: { 
+    tickets: true;
+   };
+}>;
