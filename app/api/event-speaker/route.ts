@@ -1,19 +1,14 @@
+import { prisma } from "@/lib/database/prisma";
 import { NextResponse } from "next/server";
-import { initializeDB } from "@/lib/database/db";
-import { Event } from "@/lib/database/entities/event.entity";
-import { Eventspeaker } from "@/lib/database/entities/event-speaker.entity";
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
 
 export async function GET() {
   try {
-    const db = await initializeDB();
-    const speakerRepo = db.getRepository(Eventspeaker);
-
-    const speakers = await speakerRepo.find({
-      relations: ["event"],
-      order: { created_at: "DESC" },
+    const speakers = await prisma.eventspeaker.findMany({
+      include: {
+        event: true,
+      },
+      orderBy: { created_at: "desc" },
     });
 
     return NextResponse.json(speakers);
@@ -26,7 +21,7 @@ export async function GET() {
   }
 }
 
-export async function POST(request: Request) {
+export async function POST(request : any) {
   try {
     const { formData, uuid } = await request.json();
 
@@ -37,12 +32,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const db = await initializeDB();
-    const speakerRepo = db.getRepository(Eventspeaker);
-    const eventRepo = db.getRepository(Event);
-
-    // Find the event by UUID
-    const event = await eventRepo.findOne({ where: { uuid } });
+    const event = await prisma.event.findUnique({ where: { uuid: uuid } });
 
     if (!event) {
       return NextResponse.json(
@@ -51,13 +41,9 @@ export async function POST(request: Request) {
       );
     }
 
-    // Save all speakers
-    const savedSpeakers = [];
-    for (const speakerData of formData.speakers) {
-      const speaker = speakerRepo.create({ ...speakerData, event });
-      const savedSpeaker = await speakerRepo.save(speaker);
-      savedSpeakers.push(savedSpeaker);
-    }
+    const savedSpeakers = await prisma.eventspeaker.createMany({
+      data: formData.speakers.map((speaker: any) => ({ ...speaker, eventId: event.id })),
+    });
 
     return NextResponse.json({ status: 201, data: savedSpeakers, message: "Speakers saved successfully" });
   } catch (error) {

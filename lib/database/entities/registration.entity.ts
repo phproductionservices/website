@@ -47,7 +47,5 @@ export class Registration extends BaseEntity {
   @JoinColumn()
   ticket!: any;
 
-  // @ManyToOne("Workshop", "registrations")
-  // @JoinColumn()
-  // workshop!: any;
+
 }

@@ -91,7 +91,7 @@ export default function AddTicketPage() {
 
       // Wait for 3 seconds before redirecting
       setTimeout(() => {
-        router.push(`/admin/events/create/${response.uuid}/workshops`);
+        router.push(`/admin/events/create/${uuid}/workshops`);
 
       }, 1000);
     }

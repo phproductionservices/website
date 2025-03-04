@@ -1,20 +1,17 @@
 import { NextResponse } from "next/server";
-import { initializeDB } from "@/lib/database/db";
-import { UserRegistration } from "@/lib/database/entities/userRegistration.entity";
 import * as jwt from "jsonwebtoken";
+import bcrypt from "bcryptjs";
+import { prisma } from "@/lib/database/prisma";
 
 const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key";
 
-export async function POST(request: Request) {
+export async function POST(request: any) {
   try {
     const { email, password } = await request.json();
 
-    const db = await initializeDB();
-    const userRepo = db.getRepository(UserRegistration);
-
     // Find user by email
-    const user = await userRepo.findOne({
-      where: { email }
+    const user = await prisma.userRegistration.findUnique({
+      where: { email },
     });
 
     if (!user) {
@@ -25,7 +22,7 @@ export async function POST(request: Request) {
     }
 
     // Verify password
-    const isValidPassword = await user.validatePassword(password);
+    const isValidPassword = await bcrypt.compare(password, user.password);
     if (!isValidPassword) {
       return NextResponse.json(
         { message: "Incorrect password. Please try again.", status: 401, error: true },
@@ -35,10 +32,10 @@ export async function POST(request: Request) {
 
     // Generate JWT token
     const token = jwt.sign(
-      { 
-        sub: user.uuid,
+      {
+        sub: user.id,
         email: user.email,
-        role: user.role
+        role: user.role,
       },
       JWT_SECRET,
       { expiresIn: "3h" }
@@ -51,10 +48,10 @@ export async function POST(request: Request) {
       message: "Login successful!",
       data: {
         user: userWithoutPassword,
-        access_token: token
+        access_token: token,
       },
       status: 200,
-      error: false
+      error: false,
     });
   } catch (error) {
     console.error("Error during login:", error);

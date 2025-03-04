@@ -25,26 +25,26 @@ export async function GET() {
   }
 }
 
-export async function POST(request: Request) {
-  try {
-    const { name } = await request.json();
+// export async function POST(request: Request) {
+//   try {
+//     const { name } = await request.json();
 
-    const db = await initializeDB();
-    const cityRepo = db.getRepository(City);
+//     const db = await initializeDB();
+//     const cityRepo = db.getRepository(City);
 
-    const city = cityRepo.create({ 
-      name,
-      events: []
-    });
+//     const city = cityRepo.create({ 
+//       name,
+//       events: []
+//     });
 
-    await cityRepo.save(city);
+//     await cityRepo.save(city);
 
-    return NextResponse.json(city, { status: 201 });
-  } catch (error) {
-    console.error("Error creating city:", error);
-    return NextResponse.json(
-      { error: "Failed to create city" },
-      { status: 500 }
-    );
-  }
-}
+//     return NextResponse.json(city, { status: 201 });
+//   } catch (error) {
+//     console.error("Error creating city:", error);
+//     return NextResponse.json(
+//       { error: "Failed to create city" },
+//       { status: 500 }
+//     );
+//   }
+// }

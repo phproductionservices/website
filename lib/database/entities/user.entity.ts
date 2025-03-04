@@ -16,6 +16,4 @@ export class User extends BaseEntity {
   @Column({ nullable: true })
   phone!: string;
 
-  // @OneToMany(() => Registration, (registration) => registration.user)
-  // registrations!: Registration[];
 }

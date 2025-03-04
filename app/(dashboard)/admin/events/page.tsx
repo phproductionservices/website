@@ -50,16 +50,16 @@ export default function EventsPage() {
       setFetchedEvents(false);
       try {
         const response = await fetchEventAll();
-        if (
-          response.statusCode === 404 &&
-          response.message === "Token has expired"
-        ) {
-          await clearAuth();
-          router.push("/");
-        } else if (response.statusCode === 200) {
-          setEvents(response.data.events);
-          console.log("Number of events: ", response.data);
-        }
+        // if (
+        //   response.statusCode === 404 &&
+        //   response.message === "Token has expired"
+        // ) {
+        //   await clearAuth();
+        //   router.push("/");
+        // } else if (response.statusCode === 200) {
+        //   setEvents(response.data.events);
+        //   console.log("Number of events: ", response.data);
+        // }
       } catch (error) {
         console.error("Error fetching events: ", error);
       } finally {

@@ -1,21 +1,15 @@
-import { NextResponse } from "next/server";
-import { initializeDB } from "@/lib/database/db";
-import { Registration } from "@/lib/database/entities/registration.entity";
+import { prisma } from "@/lib/database/prisma";
+import { NextResponse} from "next/server";
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
-
-export async function GET(
-  request: Request,
+export async function GET( request: Request,
   { params }: { params: { uuid: string } }
 ) {
   try {
-    const db = await initializeDB();
-    const registrationRepo = db.getRepository(Registration);
-
-    const registration = await registrationRepo.findOne({
+    const registration = await prisma.registration.findUnique({
       where: { uuid: params.uuid },
-      relations: ["user", "event", "ticket", "workshop"],
+      include: {
+        ticket: true,
+      },
     });
 
     if (!registration) {
@@ -35,18 +29,13 @@ export async function GET(
   }
 }
 
-export async function PUT(
-  request: Request,
-  { params }: { params: { uuid: string } }
-) {
+export async function PUT(request: Request,
+  { params }: { params: { uuid: string } }) {
   try {
     const { userId, eventId, ticketId, workshopId } = await request.json();
-    
-    const db = await initializeDB();
-    const registrationRepo = db.getRepository(Registration);
 
-    const registration = await registrationRepo.findOne({
-      where: { uuid: params.uuid }
+    const registration = await prisma.registration.findUnique({
+      where: { uuid: params.uuid },
     });
 
     if (!registration) {
@@ -56,16 +45,14 @@ export async function PUT(
       );
     }
 
-    Object.assign(registration, {
-      user: userId ? { id: userId } : registration.user,
-      event: eventId ? { id: eventId } : registration.event,
-      ticket: ticketId ? { id: ticketId } : registration.ticket,
-      workshop: workshopId ? { id: workshopId } : registration.workshop
+    const updatedRegistration = await prisma.registration.update({
+      where: { uuid: params.uuid },
+      data: {
+        ticketId: ticketId || registration.ticketId
+      },
     });
 
-    await registrationRepo.save(registration);
-
-    return NextResponse.json(registration);
+    return NextResponse.json(updatedRegistration);
   } catch (error) {
     console.error("Error updating registration:", error);
     return NextResponse.json(
@@ -75,16 +62,11 @@ export async function PUT(
   }
 }
 
-export async function DELETE(
-  request: Request,
-  { params }: { params: { uuid: string } }
-) {
+export async function DELETE( request: Request,
+  { params }: { params: { uuid: string } }) {
   try {
-    const db = await initializeDB();
-    const registrationRepo = db.getRepository(Registration);
-
-    const registration = await registrationRepo.findOne({
-      where: { uuid: params.uuid }
+    const registration = await prisma.registration.findUnique({
+      where: { uuid: params.uuid },
     });
 
     if (!registration) {
@@ -94,7 +76,9 @@ export async function DELETE(
       );
     }
 
-    await registrationRepo.softRemove(registration);
+    await prisma.registration.delete({
+      where: { uuid: params.uuid },
+    });
 
     return NextResponse.json({ message: "Registration deleted successfully" });
   } catch (error) {

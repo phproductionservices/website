@@ -97,6 +97,8 @@ export default function AddSpeaker() {
     });
     const dataresonse = await fetchEventbyUUID(uuid);
 
+    console.log("dataresonse : ", dataresonse);
+
     if (response.statusCode >= 200 && response.statusCode < 300) {
       toast({
         title: "Event details created successfully",
@@ -105,8 +107,8 @@ export default function AddSpeaker() {
 
       setIsLoading(false);
       setTimeout(() => {
-        console.log(dataresonse.data.isPaidFor);
-        if (dataresonse.data.isPaidFor === false) {
+        console.log(dataresonse.event.isPaidFor);
+        if (dataresonse.event.isPaidFor === false) {
           router.push(`/admin/events/create/${uuid}/workshops`);
         } else {
           router.push(`/admin/events/create/${uuid}/tickets`);
