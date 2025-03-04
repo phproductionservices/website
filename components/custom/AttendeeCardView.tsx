@@ -16,12 +16,12 @@ interface Registration {
   pricePerTicket: number;
   amount: number;
   quantity: number;
-  type: string; // "Event" or "Workshop"
+  type: string;
 }
 
 interface Ticket {
   id: number;
-  type: string; // "Event" or "Workshop"
+  type: string;
   name: string;
   price: number;
   quantity: number;
