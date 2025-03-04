@@ -9,6 +9,7 @@
     "lint": "next lint",
     "seed": "ts-node --require tsconfig-paths/register ./seed.ts",
     "prisma:dev:deploy": "prisma migrate deploy --schema=./lib/database/schema.prisma",
+    "prisma:generate": "npx prisma generate --schema=./lib/database/schema.prisma",
     "prisma:dev:migrate": "prisma migrate dev --schema=./lib/database/schema.prisma --name",
     "prisma:migrate:init": "prisma migrate dev --schema=./lib/database/schema.prisma --name init",
     "prisma:migrate:reset": "npx prisma migrate reset",
